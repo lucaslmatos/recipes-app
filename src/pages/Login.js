@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
 export default function Login() {
+  // Declaração dos estados e variáveis úteis.
   const [user, setUser] = useState({
     email: '',
     password: '',
@@ -12,6 +13,7 @@ export default function Login() {
   const passwMin = 6;
   const history = useHistory();
 
+  // Função que irá conferir as condições de login e habilitar o botão de Entrar.
   useEffect(() => {
     const regex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-_]+\.[A-Za-z]{2,}$/;
     const validaty = user.password.length > passwMin && regex.test(user.email);
@@ -20,6 +22,7 @@ export default function Login() {
     });
   }, [user.password, user.email]);
 
+  // Funsção para lidar com os campos de digitação do formulário.
   function handleChange({ target: { name, value } }) {
     setUser({
       ...user,
@@ -27,6 +30,7 @@ export default function Login() {
     });
   }
 
+  // Função para lidar com o botão de Entrar.
   function handleClick() {
     localStorage.setItem('user', JSON.stringify({ email: user.email }));
     history.push('/meals');
@@ -34,6 +38,7 @@ export default function Login() {
 
   return (
     <>
+      {/* Estrutura do formulário */}
       <header className="App-header">
         <p>APP de Receitas</p>
       </header>
