@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import renderWithRouter from './helpers/renderWithRouter';
 import App from '../App';
+import renderWithRouter from './helpers/renderWithRouter';
 
 const email = 'lucaslopesm_22@hotmail.com';
 const password = '1234567';

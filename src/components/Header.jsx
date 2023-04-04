@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import profileIcon from '../images/profileIcon.svg';
 import searchIcon from '../images/searchIcon.svg';
+import SearchBar from './SearchBar';
 
 function Header({ title, hasSearchIcon }) {
   const history = useHistory();
@@ -32,11 +33,7 @@ function Header({ title, hasSearchIcon }) {
       { hasSearchIcon
       && (
         <div>
-          { showInput
-          && <input
-            data-testid="search-input"
-            type="text"
-          />}
+          { showInput && <SearchBar />}
           <button
             onClick={ handleButtonSearch }
           >
