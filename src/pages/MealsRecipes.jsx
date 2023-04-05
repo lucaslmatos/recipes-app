@@ -3,7 +3,7 @@ import React from 'react';
 function MealsRecipes() {
   return (
     <div>
-      Drinks Recipes
+      Meals Recipes
     </div>
   );
 }
