@@ -13,33 +13,25 @@ export default function RecipeDetails({ type }) {
   useEffect(() => {
     async function getList() {
       const fetchdata = await fecthApi(`https://www.the${type}db.com/api/json/v1/1/lookup.php?i=${id}`);
-      if (isLoading) {
-        // Guarda os dados da api no estado.
-        setRecipe({
-          id,
-          data: fetchdata,
-        });
-        // Pega os ingredientes e elimina os itens vazios da api.
-        const arr = [];
-        const vinte = 20;
-        const quinze = 15;
-        const ingredientsNumber = type === 'meal' ? vinte : quinze;
-        for (let i = 0; i < ingredientsNumber; i += 1) {
-          if (type === 'meal') {
-            const data = fetchdata.meals[0][`strIngredient${i + 1}`];
-            if (data !== null && data !== '') {
-              arr[i] = data;
-            }
-          } else {
-            const data = fetchdata.drinks[0][`strIngredient${i + 1}`];
-            if (data !== null && data !== '') {
-              arr[i] = data;
-            }
-          }
+      // Guarda os dados da api no estado.
+      setRecipe({
+        id,
+        data: fetchdata,
+      });
+      // Pega os ingredientes e elimina os itens vazios da api.
+      const arr = [];
+      const vinte = 20;
+      const quinze = 15;
+      const ingredientsNumber = type === 'meal' ? vinte : quinze;
+      for (let i = 0; i < ingredientsNumber; i += 1) {
+        const data = type === 'meal' ? fetchdata.meals[0][`strIngredient${i + 1}`]
+          : fetchdata.drinks[0][`strIngredient${i + 1}`];
+        if (data !== null && data !== '') {
+          arr[i] = data;
         }
-        // Guarda os itens no estado.
-        setIngredients(arr);
       }
+      // Guarda os itens no estado.
+      setIngredients(arr);
       setLoading(false);
     }
     getList();
