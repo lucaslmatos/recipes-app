@@ -8,6 +8,7 @@ import Recomendations from './Recomendations';
 export default function RecipeDetails({ type }) {
   const { recipe, setRecipe, ingredients, setIngredients } = useContext(AppContext);
   const [isLoading, setLoading] = useState(true);
+  const [checkBtnStart, setBtnStart] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
@@ -37,6 +38,28 @@ export default function RecipeDetails({ type }) {
     }
     getList();
   }, [id, setRecipe, type, isLoading, setIngredients, setLoading]);
+
+  useEffect(() => {
+    // Confere se já existe uma chave com as receitas completadas e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver
+    if ('doneRecipes' in localStorage) {
+      const doneRecipes = JSON.parse(localStorage.getItem('doneRecipes'));
+      if (!doneRecipes.includes((doneRec) => doneRec.id === id)) {
+        setBtnStart(true);
+      }
+    } else {
+      localStorage.setItem('doneRecipes', JSON.stringify([{
+        id: '',
+        type: '',
+        nationality: '',
+        category: '',
+        alcoholicOrNot: '',
+        name: '',
+        image: '',
+        doneDate: '',
+        tags: '',
+      }]));
+    }
+  }, [id]);
 
   if (!isLoading && type === 'meal') {
     return (
@@ -73,12 +96,21 @@ export default function RecipeDetails({ type }) {
         </div>
         <iframe
           data-testid="video"
-          width="454"
-          height="256"
+          width="360"
+          height="200"
           src={ recipe.data.meals[0].strYoutube.replace('watch?v=', 'embed/') }
           title={ recipe.data.meals[0].strMeal }
         />
         <Recomendations type="cocktail" />
+        {checkBtnStart
+        && (
+          <button
+            data-testid="start-recipe-btn"
+            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+          >
+            Start Recipe
+          </button>
+        )}
       </div>
     );
   }
@@ -118,6 +150,15 @@ export default function RecipeDetails({ type }) {
           {recipe.data.drinks[0].strInstructions}
         </div>
         <Recomendations type="meal" />
+        {checkBtnStart
+        && (
+          <button
+            data-testid="start-recipe-btn"
+            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+          >
+            Start Recipe
+          </button>
+        )}
       </div>
     );
   }

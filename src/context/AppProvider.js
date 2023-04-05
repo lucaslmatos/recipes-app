@@ -9,6 +9,7 @@ function AppProvider({ children }) {
   });
   const [ingredients, setIngredients] = useState([]);
   const [recomendations, setRecomendations] = useState();
+  const [doneRecipes, setDoneRecipes] = useState();
 
   const values = useMemo(() => ({
     recipe,
@@ -17,7 +18,9 @@ function AppProvider({ children }) {
     setIngredients,
     recomendations,
     setRecomendations,
-  }), [recipe, ingredients, recomendations]);
+    doneRecipes,
+    setDoneRecipes,
+  }), [recipe, ingredients, recomendations, doneRecipes]);
 
   return (
     <AppContext.Provider value={ values }>

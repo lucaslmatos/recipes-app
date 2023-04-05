@@ -28,8 +28,9 @@ export default function Recomendations({ type }) {
           gap: '20px',
           overflow: 'scroll',
           overflowY: 'hidden',
-          width: '400px',
-          boxSizing: 'border-box' } }
+          width: '360px',
+          boxSizing: 'border-box',
+          marginBottom: '50px' } }
       >
         {
           recomendations.map((drink, index) => (
@@ -42,7 +43,7 @@ export default function Recomendations({ type }) {
                 alt={ drink.strDrink }
                 style={ { overflowClipMargin: 'content-box',
                   overflow: 'clip' } }
-                width="190px"
+                width="170px"
               />
               <div
                 data-testid={ `${index}-recommendation-title` }
@@ -63,8 +64,9 @@ export default function Recomendations({ type }) {
           gap: '20px',
           overflow: 'scroll',
           overflowY: 'hidden',
-          width: '400px',
-          boxSizing: 'border-box' } }
+          width: '360px',
+          boxSizing: 'border-box',
+          marginBottom: '50px' } }
       >
         {
           recomendations.map((Meal, index) => (
@@ -77,7 +79,7 @@ export default function Recomendations({ type }) {
                 alt={ Meal.strMeal }
                 style={ { overflowClipMargin: 'content-box',
                   overflow: 'clip' } }
-                width="190px"
+                width="170px"
               />
               <div
                 data-testid={ `${index}-recommendation-title` }
