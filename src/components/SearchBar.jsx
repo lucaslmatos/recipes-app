@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import fecthApi from '../servers/fetchApi';
+import React, { useContext, useEffect, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+import RecipesContext from '../context/RecipesContext';
+import fetchApi from '../servers/fetchApi';
 
 function SearchBar() {
   const [recipesType, setRecipesType] = useState('');
   const [inputSearch, setInputSearch] = useState('');
+  const { listMealsOrDrinks, handleSetMealsOrDrinks } = useContext(RecipesContext);
   const location = useLocation();
+  const history = useHistory();
+  const isAtDrinkPage = location.pathname.includes('/drinks');
+  const drinksOrMeals = isAtDrinkPage ? 'thecocktaildb' : 'themealdb';
+  const drinksOrMealsKeys = isAtDrinkPage ? 'drinks' : 'meals';
+  const id = isAtDrinkPage ? 'idDrink' : 'idMeal';
 
   const handleTypeRadio = ({ target }) => {
     const { value } = target;
@@ -19,25 +26,40 @@ function SearchBar() {
       value,
     );
   };
-  const handleButtonSearch = () => {
-    const drinksOrMeals = location.pathname.includes(
-      '/drinks',
-    ) ? 'thecocktaildb' : 'themealdb';
-
+  const handleButtonSearch = async () => {
     if (recipesType === 'ingredient') {
-      fecthApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/filter.php?i=${inputSearch}`);
+      const response = await fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/filter.php?i=${inputSearch}`);
+      handleSetMealsOrDrinks(
+        response[drinksOrMealsKeys],
+      );
     }
+
     if (recipesType === 'name') {
-      fecthApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?s=${inputSearch}`);
+      const response = await fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?s=${inputSearch}`);
+      handleSetMealsOrDrinks(
+        response[drinksOrMealsKeys],
+      );
     }
+
     if (recipesType === 'first-letter') {
       if (inputSearch.length > 1) {
         global.alert('Your search must have only 1 (one) character');
         return;
       }
-      fecthApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?f=${inputSearch}`);
+      const response = await fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?f=${inputSearch}`);
+      handleSetMealsOrDrinks(
+        response[drinksOrMealsKeys],
+      );
     }
   };
+
+  useEffect(() => {
+    if (listMealsOrDrinks.length === 1) {
+      const idDrinkOrMeals = listMealsOrDrinks[0][id];
+      history.push(`/${drinksOrMealsKeys}/${idDrinkOrMeals}`);
+    }
+  }, [listMealsOrDrinks, isAtDrinkPage, history, drinksOrMealsKeys, id]);
+
   return (
     <div>
       <input
