@@ -3,17 +3,17 @@ import PropTypes from 'prop-types';
 import { useParams } from 'react-router-dom';
 import AppContext from '../context/AppContext';
 import fecthApi from '../servers/fetchApi';
+import Recomendations from './Recomendations';
 
 export default function RecipeDetails({ type }) {
-  const { recipe, setRecipe } = useContext(AppContext);
-  const { id } = useParams();
-  const [ingredients, setIngredients] = useState([]);
+  const { recipe, setRecipe, ingredients, setIngredients } = useContext(AppContext);
   const [isLoading, setLoading] = useState(true);
+  const { id } = useParams();
 
   useEffect(() => {
     async function getList() {
       const fetchdata = await fecthApi(`https://www.the${type}db.com/api/json/v1/1/lookup.php?i=${id}`);
-      // Guarda os dados da api no estado.
+      // Guarda os dados da receita pelo ID no estado.
       setRecipe({
         id,
         data: fetchdata,
@@ -32,10 +32,11 @@ export default function RecipeDetails({ type }) {
       }
       // Guarda os itens no estado.
       setIngredients(arr);
+      // Desativa o loading
       setLoading(false);
     }
     getList();
-  }, [id, setRecipe, type, isLoading]);
+  }, [id, setRecipe, type, isLoading, setIngredients, setLoading]);
 
   if (!isLoading && type === 'meal') {
     return (
@@ -75,10 +76,9 @@ export default function RecipeDetails({ type }) {
           width="454"
           height="256"
           src={ recipe.data.meals[0].strYoutube.replace('watch?v=', 'embed/') }
-          title="Chicken Teriyaki Casserole"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media;
-          gyroscope; picture-in-picture; web-share"
+          title={ recipe.data.meals[0].strMeal }
         />
+        <Recomendations type="cocktail" />
       </div>
     );
   }
@@ -117,6 +117,7 @@ export default function RecipeDetails({ type }) {
         <div data-testid="instructions">
           {recipe.data.drinks[0].strInstructions}
         </div>
+        <Recomendations type="meal" />
       </div>
     );
   }

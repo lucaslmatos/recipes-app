@@ -7,11 +7,17 @@ function AppProvider({ children }) {
     id: '',
     data: '',
   });
+  const [ingredients, setIngredients] = useState([]);
+  const [recomendations, setRecomendations] = useState();
 
   const values = useMemo(() => ({
     recipe,
     setRecipe,
-  }), [recipe]);
+    ingredients,
+    setIngredients,
+    recomendations,
+    setRecomendations,
+  }), [recipe, ingredients, recomendations]);
 
   return (
     <AppContext.Provider value={ values }>
