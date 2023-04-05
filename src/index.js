@@ -5,14 +5,20 @@ import App from './App';
 import RecipesProvider from './context/RecipesProvider';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
+import { MealsOrDrinksProvider } from './context/MealsOrDrinksProvider';
+import CategoriesProvider from './context/CategoriesProvider';
 
 ReactDOM
   .createRoot(document.getElementById('root'))
   .render(
     <BrowserRouter>
-      <RecipesProvider>
-        <App />
-      </RecipesProvider>
+      <MealsOrDrinksProvider>
+        <CategoriesProvider>
+          <RecipesProvider>
+            <App />
+          </RecipesProvider>
+        </CategoriesProvider>
+      </MealsOrDrinksProvider>
     </BrowserRouter>,
   );
 
