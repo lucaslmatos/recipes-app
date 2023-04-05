@@ -9,11 +9,6 @@ import SearchBar from '../components/SearchBar';
 import RecipesProvider from '../context/RecipesProvider';
 import renderWithRouter from './helpers/renderWithRouter';
 
-const email = 'lucaslopesm_22@hotmail.com';
-const password = '1234567';
-const emailId = 'email-input';
-const passwordlId = 'password-input';
-
 describe('Testes: Search', () => {
   const searchInputTextId = 'search-input';
   const firstLetter = 'first-letter-search-radio';
@@ -119,15 +114,8 @@ describe('Testes: Search', () => {
       <RecipesProvider>
         <App />
       </RecipesProvider>,
+      ['/meals'],
     );
-    userEvent.type(screen.getByTestId(emailId), email);
-    userEvent.type(screen.getByTestId(passwordlId), password);
-    const enter = screen.getByTestId('login-submit-btn');
-    userEvent.click(enter);
-
-    await waitFor(() => {
-      expect(history.location.pathname).toEqual('/meals');
-    });
 
     const buttonProfile = screen.getByTestId('search-top-btn');
     userEvent.click(buttonProfile);
