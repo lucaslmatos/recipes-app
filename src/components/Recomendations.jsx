@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import AppContext from '../context/AppContext';
 import fecthApi from '../servers/fetchApi';
+import '../styles/RecipeDetails.css';
 
 export default function Recomendations({ type }) {
   const { recomendations, setRecomendations } = useContext(AppContext);
@@ -23,15 +24,7 @@ export default function Recomendations({ type }) {
 
   if (!isLoading && type === 'cocktail') {
     return (
-      <div
-        style={ { display: 'flex',
-          gap: '20px',
-          overflow: 'scroll',
-          overflowY: 'hidden',
-          width: '360px',
-          boxSizing: 'border-box',
-          marginBottom: '50px' } }
-      >
+      <div className="carousel-container">
         {
           recomendations.map((drink, index) => (
             <div
@@ -41,13 +34,11 @@ export default function Recomendations({ type }) {
               <img
                 src={ drink.strDrinkThumb }
                 alt={ drink.strDrink }
-                style={ { overflowClipMargin: 'content-box',
-                  overflow: 'clip' } }
-                width="170px"
+                className="carousel-image"
               />
               <div
                 data-testid={ `${index}-recommendation-title` }
-                style={ { display: 'block', textAlign: 'center' } }
+                className="carousel-text"
               >
                 {drink.strDrink}
               </div>
@@ -59,15 +50,7 @@ export default function Recomendations({ type }) {
   }
   if (!isLoading && type === 'meal') {
     return (
-      <div
-        style={ { display: 'flex',
-          gap: '20px',
-          overflow: 'scroll',
-          overflowY: 'hidden',
-          width: '360px',
-          boxSizing: 'border-box',
-          marginBottom: '50px' } }
-      >
+      <div className="carousel-container">
         {
           recomendations.map((Meal, index) => (
             <div
@@ -77,13 +60,11 @@ export default function Recomendations({ type }) {
               <img
                 src={ Meal.strMealThumb }
                 alt={ Meal.strMeal }
-                style={ { overflowClipMargin: 'content-box',
-                  overflow: 'clip' } }
-                width="170px"
+                className="carousel-image"
               />
               <div
                 data-testid={ `${index}-recommendation-title` }
-                style={ { display: 'block', textAlign: 'center' } }
+                className="carousel-text"
               >
                 {Meal.strMeal}
               </div>

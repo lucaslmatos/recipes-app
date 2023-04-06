@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import AppContext from '../context/AppContext';
 import fecthApi from '../servers/fetchApi';
 import Recomendations from './Recomendations';
+import '../styles/RecipeDetails.css';
 
 export default function RecipeDetails({ type }) {
   const { recipe, setRecipe, ingredients, setIngredients } = useContext(AppContext);
@@ -11,16 +12,13 @@ export default function RecipeDetails({ type }) {
   const [checkBtnStart, setBtnStart] = useState(true);
   const [checkBtnProg, setBtnProg] = useState(false);
   const { id } = useParams();
+  const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
     async function getList() {
       const fetchdata = await fecthApi(`https://www.the${type}db.com/api/json/v1/1/lookup.php?i=${id}`);
-      // Guarda os dados da receita pelo ID no estado.
-      setRecipe({
-        id,
-        data: fetchdata,
-      });
-      // Pega os ingredientes e elimina os itens vazios da api.
+      setRecipe({ id, data: fetchdata }); // Guarda os dados da receita pelo ID no estado.
       const arr = [];
       const vinte = 20;
       const quinze = 15;
@@ -28,42 +26,24 @@ export default function RecipeDetails({ type }) {
       for (let i = 0; i < ingredientsNumber; i += 1) {
         const data = type === 'meal' ? fetchdata.meals[0][`strIngredient${i + 1}`]
           : fetchdata.drinks[0][`strIngredient${i + 1}`];
-        if (data !== null && data !== '') {
-          arr[i] = data;
-        }
+        if (data !== null && data !== '') { arr[i] = data; } // Pega os ingredientes e elimina os itens vazios da api.
       }
-      // Guarda os itens no estado.
-      setIngredients(arr);
-      // Desativa o loading
-      setLoading(false);
+      setIngredients(arr); // Guarda os itens no estado.
+      setLoading(false); // Desativa o loading
     }
     getList();
   }, [id, setRecipe, type, isLoading, setIngredients, setLoading]);
 
-  useEffect(() => {
-    // Confere se já existe uma chave com as receitas completadas e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver
+  useEffect(() => { // Confere se já existe uma chave com as receitas completadas e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver
     if ('doneRecipes' in localStorage) {
       const doneRecipes = JSON.parse(localStorage.getItem('doneRecipes'));
-      if (doneRecipes.find((doneRec) => doneRec.id === id)) {
-        setBtnStart(false);
-      }
+      if (doneRecipes.find((doneRec) => doneRec.id === id)) { setBtnStart(false); }
     } else {
-      localStorage.setItem('doneRecipes', JSON.stringify([{
-        id: '',
-        type: '',
-        nationality: '',
-        category: '',
-        alcoholicOrNot: '',
-        name: '',
-        image: '',
-        doneDate: '',
-        tags: '',
-      }]));
+      localStorage.setItem('doneRecipes', JSON.stringify([{ id: '' }]));
     }
   }, [id]);
 
-  useEffect(() => {
-    // Confere se já existe uma chave com as receitas em progresso e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver.
+  useEffect(() => { // Confere se já existe uma chave com as receitas em progresso e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver.
     if ('inProgressRecipes' in localStorage) {
       const inProgressRecipes = JSON.parse(localStorage.getItem('inProgressRecipes'));
       if (inProgressRecipes.drinks
@@ -76,11 +56,14 @@ export default function RecipeDetails({ type }) {
       }
     } else {
       localStorage.setItem('inProgressRecipes', JSON.stringify({
-        drinks: { 15997: [] },
-        meals: { 52772: [] },
+        drinks: { 15997: [] }, meals: { 52772: [] },
       }));
     }
   }, [id]);
+
+  function handleClick({ target: { name } }) {
+    if (name === 'Start') { history.push(`${location.pathname}/in-progress`); }
+  }
 
   if (!isLoading && type === 'meal') {
     return (
@@ -103,14 +86,13 @@ export default function RecipeDetails({ type }) {
           {recipe.data.meals[0].strCategory}
         </div>
         <ul>
-          {ingredients
-            .map((__, index) => (
-              <li key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
-                {recipe.data.meals[0][`strIngredient${index + 1}`]}
-                {'     '}
-                {recipe.data.meals[0][`strMeasure${index + 1}`]}
-              </li>
-            ))}
+          {ingredients.map((__, index) => (
+            <li key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
+              {recipe.data.meals[0][`strIngredient${index + 1}`]}
+              {'     '}
+              {recipe.data.meals[0][`strMeasure${index + 1}`]}
+            </li>
+          ))}
         </ul>
         <div data-testid="instructions">
           {recipe.data.meals[0].strInstructions}
@@ -123,11 +105,29 @@ export default function RecipeDetails({ type }) {
           title={ recipe.data.meals[0].strMeal }
         />
         <Recomendations type="cocktail" />
+        <div className="social-buttons-div">
+          <button
+            data-testid="share-btn"
+            name="Share"
+            onClick={ handleClick }
+          >
+            Share
+          </button>
+          <button
+            data-testid="favorite-btn"
+            name="Favorite"
+            onClick={ handleClick }
+          >
+            Favorite
+          </button>
+        </div>
         {checkBtnStart && !checkBtnProg
         && (
           <button
             data-testid="start-recipe-btn"
-            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+            name="Start"
+            className="action-buttons"
+            onClick={ handleClick }
           >
             Start Recipe
           </button>
@@ -136,7 +136,8 @@ export default function RecipeDetails({ type }) {
         && (
           <button
             data-testid="start-recipe-btn"
-            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+            name="Continue"
+            className="action-buttons"
           >
             Continue Recipe
           </button>
@@ -167,24 +168,41 @@ export default function RecipeDetails({ type }) {
           drink.
         </div>
         <ul>
-          {ingredients
-            .map((__, index) => (
-              <li key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
-                {recipe.data.drinks[0][`strIngredient${index + 1}`]}
-                {'     '}
-                {recipe.data.drinks[0][`strMeasure${index + 1}`]}
-              </li>
-            ))}
+          {ingredients.map((__, index) => (
+            <li key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
+              {recipe.data.drinks[0][`strIngredient${index + 1}`]}
+              {'     '}
+              {recipe.data.drinks[0][`strMeasure${index + 1}`]}
+            </li>
+          ))}
         </ul>
         <div data-testid="instructions">
           {recipe.data.drinks[0].strInstructions}
         </div>
         <Recomendations type="meal" />
+        <div className="social-buttons-div">
+          <button
+            data-testid="share-btn"
+            name="Share"
+            onClick={ handleClick }
+          >
+            Share
+          </button>
+          <button
+            data-testid="favorite-btn"
+            name="Favorite"
+            onClick={ handleClick }
+          >
+            Favorite
+          </button>
+        </div>
         {checkBtnStart && !checkBtnProg
         && (
           <button
             data-testid="start-recipe-btn"
-            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+            name="Start"
+            className="action-buttons"
+            onClick={ handleClick }
           >
             Start Recipe
           </button>
@@ -193,7 +211,8 @@ export default function RecipeDetails({ type }) {
         && (
           <button
             data-testid="start-recipe-btn"
-            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+            name="Continue"
+            className="action-buttons"
           >
             Continue Recipe
           </button>
