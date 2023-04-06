@@ -9,6 +9,7 @@ export default function RecipeDetails({ type }) {
   const { recipe, setRecipe, ingredients, setIngredients } = useContext(AppContext);
   const [isLoading, setLoading] = useState(true);
   const [checkBtnStart, setBtnStart] = useState(true);
+  const [checkBtnProg, setBtnProg] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
@@ -48,7 +49,7 @@ export default function RecipeDetails({ type }) {
       }
     } else {
       localStorage.setItem('doneRecipes', JSON.stringify([{
-        id: '15997',
+        id: '',
         type: '',
         nationality: '',
         category: '',
@@ -58,6 +59,26 @@ export default function RecipeDetails({ type }) {
         doneDate: '',
         tags: '',
       }]));
+    }
+  }, [id]);
+
+  useEffect(() => {
+    // Confere se já existe uma chave com as receitas em progresso e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver.
+    if ('inProgressRecipes' in localStorage) {
+      const inProgressRecipes = JSON.parse(localStorage.getItem('inProgressRecipes'));
+      if (inProgressRecipes.drinks
+        && Object.keys(inProgressRecipes.drinks).find((key) => key === id)) {
+        setBtnProg(true);
+      }
+      if (inProgressRecipes.meals
+        && Object.keys(inProgressRecipes.meals).find((key) => key === id)) {
+        setBtnProg(true);
+      }
+    } else {
+      localStorage.setItem('inProgressRecipes', JSON.stringify({
+        drinks: { 15997: [] },
+        meals: { 52772: [] },
+      }));
     }
   }, [id]);
 
@@ -102,13 +123,22 @@ export default function RecipeDetails({ type }) {
           title={ recipe.data.meals[0].strMeal }
         />
         <Recomendations type="cocktail" />
-        {checkBtnStart
+        {checkBtnStart && !checkBtnProg
         && (
           <button
             data-testid="start-recipe-btn"
             style={ { position: 'fixed', bottom: '0px', left: '130px' } }
           >
             Start Recipe
+          </button>
+        )}
+        {checkBtnProg
+        && (
+          <button
+            data-testid="start-recipe-btn"
+            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+          >
+            Continue Recipe
           </button>
         )}
       </div>
@@ -150,13 +180,22 @@ export default function RecipeDetails({ type }) {
           {recipe.data.drinks[0].strInstructions}
         </div>
         <Recomendations type="meal" />
-        {checkBtnStart
+        {checkBtnStart && !checkBtnProg
         && (
           <button
             data-testid="start-recipe-btn"
             style={ { position: 'fixed', bottom: '0px', left: '130px' } }
           >
             Start Recipe
+          </button>
+        )}
+        {checkBtnProg
+        && (
+          <button
+            data-testid="start-recipe-btn"
+            style={ { position: 'fixed', bottom: '0px', left: '130px' } }
+          >
+            Continue Recipe
           </button>
         )}
       </div>
