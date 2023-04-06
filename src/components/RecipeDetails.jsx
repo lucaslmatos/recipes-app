@@ -8,7 +8,7 @@ import Recomendations from './Recomendations';
 export default function RecipeDetails({ type }) {
   const { recipe, setRecipe, ingredients, setIngredients } = useContext(AppContext);
   const [isLoading, setLoading] = useState(true);
-  const [checkBtnStart, setBtnStart] = useState(false);
+  const [checkBtnStart, setBtnStart] = useState(true);
   const { id } = useParams();
 
   useEffect(() => {
@@ -43,12 +43,12 @@ export default function RecipeDetails({ type }) {
     // Confere se já existe uma chave com as receitas completadas e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver
     if ('doneRecipes' in localStorage) {
       const doneRecipes = JSON.parse(localStorage.getItem('doneRecipes'));
-      if (!doneRecipes.includes((doneRec) => doneRec.id === id)) {
-        setBtnStart(true);
+      if (doneRecipes.find((doneRec) => doneRec.id === id)) {
+        setBtnStart(false);
       }
     } else {
       localStorage.setItem('doneRecipes', JSON.stringify([{
-        id: '',
+        id: '15997',
         type: '',
         nationality: '',
         category: '',
