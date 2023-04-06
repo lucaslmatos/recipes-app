@@ -12,7 +12,7 @@ function RecipesProvider({ children }) {
   const drinksOrMealsKeys = isAtDrinkPage ? 'drinks' : 'meals';
 
   useEffect(() => {
-    const getFetchApi = async () => { // fetch para as receitas de comidas
+    const getFetchApi = async () => { // fetch para as receitas de comidas.
       const response = await fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?s=`);
       const data = response[drinksOrMealsKeys];
       // seta o estado meals e drinks com todas as receitas de comidas
