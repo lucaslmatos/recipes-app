@@ -29,7 +29,7 @@ function Recipes({ type, recipes }) {
               <img
                 data-testid={ `${index}-card-img` }
                 src={
-                  type === 'meal' ? recipe.strMealThumb : recipe.strDrinkThumb
+                  `${recipe[type === 'meal' ? 'strMealThumb' : 'strDrinkThumb']}/preview`
                 // recipe.strMealThumb || recipe.strDrinkThumb
                 }
                 alt={ type === 'meal' ? recipe.strMeal : recipe.strDrink }
