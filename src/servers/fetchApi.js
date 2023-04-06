@@ -4,4 +4,4 @@ const fetchApi = async (url) => {
   return data;
 };
 
-export default fecthApi;
+export default fetchApi;
