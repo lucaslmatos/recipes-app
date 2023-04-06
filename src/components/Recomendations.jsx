@@ -8,6 +8,7 @@ export default function Recomendations({ type }) {
   const { recomendations, setRecomendations } = useContext(AppContext);
   const [isLoading, setLoading] = useState(true);
   const six = 6;
+  const check2 = type === 'meal' ? 'Meal' : 'Drink';
 
   useEffect(() => {
     async function getList() {
@@ -22,51 +23,25 @@ export default function Recomendations({ type }) {
     getList();
   }, [type, setRecomendations, setLoading]);
 
-  if (!isLoading && type === 'cocktail') {
+  if (!isLoading) {
     return (
       <div className="carousel-container">
         {
-          recomendations.map((drink, index) => (
+          recomendations.map((item, index) => (
             <div
               key={ index }
               data-testid={ `${index}-recommendation-card` }
             >
               <img
-                src={ drink.strDrinkThumb }
-                alt={ drink.strDrink }
+                src={ item[`str${check2}Thumb`] }
+                alt={ item[`str${check2}`] }
                 className="carousel-image"
               />
               <div
                 data-testid={ `${index}-recommendation-title` }
                 className="carousel-text"
               >
-                {drink.strDrink}
-              </div>
-            </div>
-          ))
-        }
-      </div>
-    );
-  }
-  if (!isLoading && type === 'meal') {
-    return (
-      <div className="carousel-container">
-        {
-          recomendations.map((Meal, index) => (
-            <div
-              key={ index }
-              data-testid={ `${index}-recommendation-card` }
-            >
-              <img
-                src={ Meal.strMealThumb }
-                alt={ Meal.strMeal }
-                className="carousel-image"
-              />
-              <div
-                data-testid={ `${index}-recommendation-title` }
-                className="carousel-text"
-              >
-                {Meal.strMeal}
+                {item[`str${check2}`]}
               </div>
             </div>
           ))
