@@ -7,6 +7,8 @@ import fecthApi from '../servers/fetchApi';
 import Recomendations from './Recomendations';
 import '../styles/RecipeDetails.css';
 import shareIcon from '../images/shareIcon.svg';
+import whiteHeartIcon from '../images/whiteHeartIcon.svg';
+import blackHeartIcon from '../images/blackHeartIcon.svg';
 
 export default function RecipeDetails({ type }) {
   const { recipe, setRecipe, ingredients, setIngredients } = useContext(AppContext);
@@ -14,6 +16,7 @@ export default function RecipeDetails({ type }) {
   const [checkBtnStart, setBtnStart] = useState(true);
   const [checkBtnProg, setBtnProg] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [isFavorite, setFavorite] = useState(false);
   const { id } = useParams();
   const history = useHistory();
   const location = useLocation();
@@ -67,6 +70,15 @@ export default function RecipeDetails({ type }) {
     }
   }, [id]);
 
+  useEffect(() => {
+    if ('favoriteRecipes' in localStorage) {
+      const favoriteRecipes = JSON.parse(localStorage.getItem('favoriteRecipes'));
+      if (favoriteRecipes.find((rec) => rec.id === id)) {
+        setFavorite(true);
+      }
+    }
+  }, [id]);
+
   function handleClick({ target: { name } }) {
     if (name === 'Start') { history.push(`${location.pathname}/in-progress`); }
     const actualRecipe = {
@@ -80,14 +92,24 @@ export default function RecipeDetails({ type }) {
     };
     if (name === 'Favorite' && 'favoriteRecipes' in localStorage) {
       const favoriteRecipes = JSON.parse(localStorage.getItem('favoriteRecipes'));
-      favoriteRecipes.push(actualRecipe);
-      localStorage.setItem('favoriteRecipes', JSON.stringify(favoriteRecipes));
+      if (!isFavorite) {
+        favoriteRecipes.push(actualRecipe);
+        localStorage.setItem('favoriteRecipes', JSON.stringify(favoriteRecipes));
+        setFavorite(true);
+      } else {
+        const newfavoriteecipes = favoriteRecipes.filter((e) => e.id !== id);
+        localStorage.setItem('favoriteRecipes', JSON.stringify(newfavoriteecipes));
+        setFavorite(false);
+      }
     } else {
       localStorage.setItem('favoriteRecipes', JSON.stringify([actualRecipe]));
+      setFavorite(true);
+    }
+    if (name === 'Share') {
+      setLinkCopied(true);
+      copy(`http://localhost:3000${location.pathname}`);
     }
   }
-
-  // `http://localhost:3000${location.pathname}`
 
   if (!isLoading) {
     return (
@@ -139,21 +161,36 @@ export default function RecipeDetails({ type }) {
           ? <Recomendations type="cocktail" /> : <Recomendations type="meal" />}
         <div className="social-buttons-div">
           <button
-            data-testid="share-btn"
             name="Share"
-            onClick={ () => {
-              setLinkCopied(true);
-              copy(`http://localhost:3000${location.pathname}`);
-            } }
-          >
-            <img src={ shareIcon } alt="share icon" />
-          </button>
-          <button
-            data-testid="favorite-btn"
-            name="Favorite"
             onClick={ handleClick }
           >
-            Favorite
+            <img
+              data-testid="share-btn"
+              name="Share"
+              src={ shareIcon }
+              alt="share icon"
+            />
+          </button>
+          <button
+            name="Favorite"
+            src={ isFavorite ? blackHeartIcon : whiteHeartIcon }
+            onClick={ handleClick }
+          >
+            {isFavorite
+              ? (
+                <img
+                  data-testid="favorite-btn"
+                  name="Favorite"
+                  src={ blackHeartIcon }
+                  alt="share icon"
+                />)
+              : (
+                <img
+                  data-testid="favorite-btn"
+                  name="Favorite"
+                  src={ whiteHeartIcon }
+                  alt="share icon"
+                />)}
           </button>
         </div>
         {linkCopied && <div> Link copied!</div>}

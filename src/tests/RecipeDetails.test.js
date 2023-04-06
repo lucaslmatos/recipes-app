@@ -1,13 +1,16 @@
 import { screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
+import userEvent from '@testing-library/user-event';
 import renderWithRouter from './helpers/renderWithRouter';
 import App from '../App';
+
+const meals = '/meals/52772';
 
 describe('Testes: Página de Detalhes da Receita.', () => {
   test('Informações sobre receita de comidas aparecem na tela', async () => {
     const { history } = renderWithRouter(<App />);
     act(() => {
-      history.push('/meals/52772');
+      history.push(meals);
     });
 
     await waitFor(() => {
@@ -87,6 +90,56 @@ describe('Testes: Página de Detalhes da Receita.', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId(/start-recipe-btn/i)).toBeInTheDocument();
+    }, { timeout: 4000 });
+  });
+
+  test('Botão de Continue deve aparecer, caso receita exista no local storage como iniciada', async () => {
+    const { history } = renderWithRouter(<App />);
+
+    localStorage.setItem('inProgressRecipes', JSON.stringify({
+      drinks: { 15997: [] }, meals: { 52772: [] },
+    }));
+
+    act(() => {
+      history.push(meals);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(/start-recipe-btn/i)).toBeInTheDocument();
+    }, { timeout: 4000 });
+  });
+
+  test('Botão de favorito deve estar preenchido caso exista a receita na chave de favoritos', async () => {
+    const { history } = renderWithRouter(<App />);
+
+    localStorage.setItem('favoriteRecipes', JSON.stringify([{
+      id: '52772',
+    }]));
+
+    act(() => {
+      history.push(meals);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'blackHeartIcon.svg');
+      userEvent.click(screen.getByTestId(/favorite-btn/i));
+      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'whiteHeartIcon.svg');
+      userEvent.click(screen.getByTestId(/favorite-btn/i));
+      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'blackHeartIcon.svg');
+    }, { timeout: 4000 });
+  });
+
+  test('Ao clicar no botão de favoritar e não ouver a chave de favoritos, ela deve ser criada', async () => {
+    const { history } = renderWithRouter(<App />);
+    localStorage.clear();
+
+    act(() => {
+      history.push(meals);
+    });
+
+    await waitFor(() => {
+      userEvent.dblClick(screen.getByTestId(/favorite-btn/i));
+      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'whiteHeartIcon.svg');
     }, { timeout: 4000 });
   });
 });
