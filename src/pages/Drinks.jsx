@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import Recipes from '../components/Recipes';
 import RecipesContext from '../context/RecipesContext';
 
 function Drinks() {
@@ -20,20 +21,7 @@ function Drinks() {
   return (
     <div>
       <Header title="Drinks" hasSearchIcon />
-      { newListDrinks.map((product, index) => (
-        <div key={ product.strDrink } data-testid={ `${index}-recipe-card` }>
-          <p
-            data-testid={ `${index}-card-name` }
-          >
-            { product.strDrink }
-          </p>
-          <img
-            data-testid={ `${index}-card-img` }
-            src={ product.strDrinkThumb }
-            alt={ product.strDrink }
-          />
-        </div>
-      )) }
+      <Recipes type="drink" recipes={ newListDrinks } />
       <Footer />
     </div>
   );

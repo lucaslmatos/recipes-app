@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import Recipes from '../components/Recipes';
 import RecipesContext from '../context/RecipesContext';
 
 function Meals() {
@@ -15,25 +16,12 @@ function Meals() {
     }
   }, [listMealsOrDrinks, history]);
   const maxNumber = 12;
-  const newListMeals = listMealsOrDrinks.slice(0, maxNumber);
+  const newListDrinks = listMealsOrDrinks.slice(0, maxNumber);
 
   return (
     <div>
       <Header title="Meals" hasSearchIcon />
-      { newListMeals.map((product, index) => (
-        <div key={ product.strMeal } data-testid={ `${index}-recipe-card` }>
-          <p
-            data-testid={ `${index}-card-name` }
-          >
-            { product.strMeal }
-          </p>
-          <img
-            data-testid={ `${index}-card-img` }
-            src={ product.strMealThumb }
-            alt={ product.strMeal }
-          />
-        </div>
-      )) }
+      <Recipes type="meal" recipes={ newListDrinks } />
       <Footer />
     </div>
   );
