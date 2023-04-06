@@ -2,23 +2,20 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import CategoriesProvider from './context/CategoriesProvider';
 import RecipesProvider from './context/RecipesProvider';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
-import { MealsOrDrinksProvider } from './context/MealsOrDrinksProvider';
-import CategoriesProvider from './context/CategoriesProvider';
 
 ReactDOM
   .createRoot(document.getElementById('root'))
   .render(
     <BrowserRouter>
-      <MealsOrDrinksProvider>
-        <CategoriesProvider>
-          <RecipesProvider>
-            <App />
-          </RecipesProvider>
-        </CategoriesProvider>
-      </MealsOrDrinksProvider>
+      <CategoriesProvider>
+        <RecipesProvider>
+          <App />
+        </RecipesProvider>
+      </CategoriesProvider>
     </BrowserRouter>,
   );
 
