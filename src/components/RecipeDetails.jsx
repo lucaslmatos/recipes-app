@@ -19,6 +19,7 @@ export default function RecipeDetails({ type }) {
   const location = useLocation();
   const check = type === 'meal' ? 'meals' : 'drinks';
   const check2 = type === 'meal' ? 'Meal' : 'Drink';
+  const check3 = type === 'meal' ? 'meal' : 'drink';
 
   useEffect(() => {
     async function getList() {
@@ -68,6 +69,22 @@ export default function RecipeDetails({ type }) {
 
   function handleClick({ target: { name } }) {
     if (name === 'Start') { history.push(`${location.pathname}/in-progress`); }
+    const actualRecipe = {
+      id,
+      type: check3,
+      nationality: check === 'meals' ? recipe.data[check][0].strArea : '',
+      category: recipe.data[check][0].strCategory,
+      alcoholicOrNot: check === 'drinks' ? recipe.data[check][0].strAlcoholic : '',
+      name: recipe.data[check][0][`str${check2}`],
+      image: recipe.data[check][0][`str${check2}Thumb`],
+    };
+    if (name === 'Favorite' && 'favoriteRecipes' in localStorage) {
+      const favoriteRecipes = JSON.parse(localStorage.getItem('favoriteRecipes'));
+      favoriteRecipes.push(actualRecipe);
+      localStorage.setItem('favoriteRecipes', JSON.stringify(favoriteRecipes));
+    } else {
+      localStorage.setItem('favoriteRecipes', JSON.stringify([actualRecipe]));
+    }
   }
 
   // `http://localhost:3000${location.pathname}`
