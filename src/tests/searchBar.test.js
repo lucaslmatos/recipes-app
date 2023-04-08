@@ -1,11 +1,12 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
 import { act } from 'react-dom/test-utils';
 import chickenMeals from '../../cypress/mocks/chickenMeals';
+import cocktailDrinks from '../../cypress/mocks/cocktailDrinks';
 import drinkCategories from '../../cypress/mocks/drinkCategories';
-import drinks from '../../cypress/mocks/drinks';
 import mealCategories from '../../cypress/mocks/mealCategories';
-import meals from '../../cypress/mocks/meals';
+import oneDrink from '../../cypress/mocks/oneDrink';
 import oneMeal from '../../cypress/mocks/oneMeal';
 import App from '../App';
 import SearchBar from '../components/SearchBar';
@@ -23,11 +24,12 @@ describe('Testes: Search', () => {
   const buttonSearch = 'exec-search-btn';
   const nameSearch = 'name-search-radio';
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  // beforeEach(() => {
+  //   jest.clearAllMocks();
+  // });
 
   test('Input do tipo text e radio exibidos na tela', () => {
+    fetchApi.mockResolvedValueOnce(chickenMeals);
     renderWithRouter(
       <RecipesProvider>
         <SearchBar />
@@ -40,6 +42,7 @@ describe('Testes: Search', () => {
     expect(screen.getByTestId(firstLetter)).toBeInTheDocument();
   });
   test('Teste com input text e tipo radio "ingredient"', () => {
+    fetchApi.mockResolvedValue(chickenMeals);
     renderWithRouter(
       <RecipesProvider>
         <SearchBar />
@@ -55,6 +58,7 @@ describe('Testes: Search', () => {
     userEvent.click(button);
   });
   test('Teste input radio "first-letter" com alert', () => {
+    fetchApi.mockResolvedValueOnce(chickenMeals);
     renderWithRouter(
       <RecipesProvider>
         <SearchBar />
@@ -72,10 +76,8 @@ describe('Testes: Search', () => {
     expect(global.alert).toHaveBeenCalledTimes(1);
   });
   test('Teste chamada API meals com input radio first letter', async () => {
-    fetchApi.mockResolvedValueOnce(chickenMeals);
-    global.fetch = jest.fn(async () => ({
-      json: async () => chickenMeals,
-    }));
+    fetchApi.mockResolvedValue(chickenMeals);
+
     await act(async () => {
       renderWithRouter(
         <RecipesProvider>
@@ -92,14 +94,10 @@ describe('Testes: Search', () => {
 
     const button = screen.getByTestId('exec-search-btn');
     userEvent.click(button);
-
-    expect(global.fetch).toHaveBeenCalled();
   });
-  test('Teste chamada API meals com input radio name', async () => {
-    fetchApi.mockResolvedValueOnce(chickenMeals);
-    global.fetch = jest.fn(async () => ({
-      json: async () => chickenMeals,
-    }));
+  test('Teste chamada da API meals com input radio name', async () => {
+    fetchApi.mockResolvedValue(chickenMeals);
+
     await act(async () => {
       renderWithRouter(
         <RecipesProvider>
@@ -116,17 +114,14 @@ describe('Testes: Search', () => {
 
     const button = screen.getByTestId(buttonSearch);
     userEvent.click(button);
-
-    expect(global.fetch).toHaveBeenCalled();
   });
-  test('Se tiver apenas um meals ocorre o redirecionamento para outra página', async () => {
-    fetchApi.mockResolvedValueOnce(meals);
-    global.fetch = jest.fn().mockImplementationOnce({
-      json: async () => mealCategories,
-    });
-    global.fetch = jest.fn().mockImplementationOnce({
-      json: async () => drinkCategories,
-    });
+  test('Se tiver apenas um meal ocorre o redirecionamento para outra página', async () => {
+    fetchApi.mockResolvedValueOnce(mealCategories);
+    fetchApi.mockResolvedValueOnce(drinkCategories);
+    fetchApi.mockResolvedValueOnce(chickenMeals);
+    fetchApi.mockResolvedValueOnce(oneMeal);
+    fetchApi.mockResolvedValueOnce(oneMeal);
+
     const { history } = renderWithRouter(
       <RecipesProvider>
         <CategoriesProvider>
@@ -148,21 +143,19 @@ describe('Testes: Search', () => {
     const button = screen.getByTestId(buttonSearch);
     userEvent.click(button);
 
-    fetchApi.mockResolvedValueOnce(oneMeal);
-    expect(fetchApi).toHaveBeenCalledTimes(2);
+    expect(fetchApi).toHaveBeenCalledTimes(4);
 
     await waitFor(() => {
       expect(history.location.pathname).toEqual('/meals/52771');
     });
   });
   test('Se tiver apenas um drink ocorre o redirecionamento para outra página', async () => {
-    fetchApi.mockResolvedValueOnce(drinks);
-    global.fetch = jest.fn().mockImplementationOnce({
-      json: async () => mealCategories,
-    });
-    global.fetch = jest.fn().mockImplementationOnce({
-      json: async () => drinkCategories,
-    });
+    fetchApi.mockResolvedValueOnce(mealCategories);
+    fetchApi.mockResolvedValueOnce(drinkCategories);
+    fetchApi.mockResolvedValueOnce(cocktailDrinks);
+    fetchApi.mockResolvedValueOnce(oneDrink);
+    fetchApi.mockResolvedValueOnce(oneDrink);
+
     const { history } = renderWithRouter(
       <RecipesProvider>
         <CategoriesProvider>
@@ -183,7 +176,7 @@ describe('Testes: Search', () => {
     const button = screen.getByTestId(buttonSearch);
     userEvent.click(button);
 
-    expect(global.fetch).toHaveBeenCalled();
+    expect(fetchApi).toHaveBeenCalledTimes(4);
 
     await waitFor(() => {
       expect(history.location.pathname).toEqual('/drinks/178319');

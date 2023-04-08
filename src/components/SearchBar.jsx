@@ -39,6 +39,7 @@ function SearchBar() {
       return fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?f=${inputSearch}`);
     }
   };
+
   const handleButtonSearch = async () => {
     if (recipesType === 'first-letter' && inputSearch.length !== 1) { // se for busca por letra, só pode ter 1 caracter
       global.alert('Your search must have only 1 (one) character');
