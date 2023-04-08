@@ -6,14 +6,16 @@ import RecipesContext from './RecipesContext';
 
 function RecipesProvider({ children }) {
   const [listMealsOrDrinks, setListMealsOrDrinks] = useState([]);
+  const [category, setCategory] = useState('');
   const location = useLocation();
   const isAtDrinkPage = location.pathname.includes('/drinks');
   const drinksOrMeals = isAtDrinkPage ? 'thecocktaildb' : 'themealdb';
   const drinksOrMealsKeys = isAtDrinkPage ? 'drinks' : 'meals';
 
   useEffect(() => {
-    const getFetchApi = async () => { // fetch para as receitas de comidas.
-      const response = await fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?s=`);
+    const getFetchApi = async () => { // fetch para as receitas de comidas
+      const endpoint = category ? `filter.php?c=${category}` : 'search.php?s=';
+      const response = await fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/${endpoint}`);
       const data = response[drinksOrMealsKeys];
       // seta o estado meals e drinks com todas as receitas de comidas
       setListMealsOrDrinks(
@@ -21,7 +23,7 @@ function RecipesProvider({ children }) {
       );
     };
     getFetchApi();
-  }, [drinksOrMeals, drinksOrMealsKeys]);
+  }, [drinksOrMeals, drinksOrMealsKeys, category]);
 
   const value = useMemo(
     () => {
@@ -36,9 +38,13 @@ function RecipesProvider({ children }) {
         );
       };
       return {
-        listMealsOrDrinks, handleSetMealsOrDrinks };
+        listMealsOrDrinks,
+        handleSetMealsOrDrinks,
+        setListMealsOrDrinks,
+        setCategory,
+      };
     },
-    [listMealsOrDrinks, setListMealsOrDrinks],
+    [listMealsOrDrinks, setListMealsOrDrinks, setCategory],
   );
 
   return (
