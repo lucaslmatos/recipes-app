@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
+import CategoriesProvider from '../context/CategoriesProvider';
 import RecipesProvider from '../context/RecipesProvider';
 import renderWithRouter from './helpers/renderWithRouter';
 
@@ -34,7 +35,9 @@ describe('Testes: Página de Login.', () => {
   test('Verifica se ao clicar no botão Enter ele redireciona para rota /meals', async () => {
     const { history } = renderWithRouter(
       <RecipesProvider>
-        <App />
+        <CategoriesProvider>
+          <App />
+        </CategoriesProvider>
       </RecipesProvider>,
     );
     const enter = screen.getByTestId('login-submit-btn');

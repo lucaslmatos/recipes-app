@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useEffect, useMemo, useState } from 'react';
+import fetchApi from '../servers/fetchApi';
 import CategoriesContext from './CategoriesContext';
 
 function CategoriesProvider({ children }) {
@@ -13,18 +14,27 @@ function CategoriesProvider({ children }) {
     setDrinksCategories,
   }), [mealsCategories, drinksCategories]);
 
-  useEffect(() => { // fetch para as categorias de comidas
-    fetch('https://www.themealdb.com/api/json/v1/1/list.php?c=list')
-      .then((response) => response.json())
-      .then((data) => setMealsCategories(data.meals)) // seta o estado mealsCategories com todas as categorias de comidas
-      .catch((error) => console.log(error.message));
-  }, []);
+  const fetchMealsCategories = async () => {
+    try {
+      const { meals } = await fetchApi('https://www.themealdb.com/api/json/v1/1/list.php?c=list');
+      setMealsCategories(meals);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
-  useEffect(() => { // fetch para as categorias de bebidas
-    fetch('https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list')
-      .then((response) => response.json())
-      .then((data) => setDrinksCategories(data.drinks)) // seta o estado drinksCategories com todas as categorias de bebidas
-      .catch((error) => console.log(error.message));
+  const fetchDrinksCategories = async () => {
+    try {
+      const { drinks } = await fetchApi('https://www.thecocktaildb.com/api/json/v1/1/list.php?c=list');
+      setDrinksCategories(drinks);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  useEffect(() => { // fetch para as categorias de comidas
+    fetchMealsCategories();
+    fetchDrinksCategories();
   }, []);
 
   return (

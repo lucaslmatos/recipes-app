@@ -1,108 +1,128 @@
+import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { fireEvent, screen } from '@testing-library/react';
-import Recipes from '../components/Recipes';
-// import CategoriesContext from '../context/CategoriesContext';
-// import RecipesContext from '../context/RecipesContext';
-import renderWithRouter from './helpers/renderWithRouter';
-import Categories from '../components/Categories';
-import RecipesProvider from '../context/RecipesProvider';
+import chickenMeals from '../../cypress/mocks/chickenMeals';
+import cocktailDrinks from '../../cypress/mocks/cocktailDrinks';
+import cocoaDrinks from '../../cypress/mocks/cocoaDrinks';
+import drinkCategories from '../../cypress/mocks/drinkCategories';
+import mealCategories from '../../cypress/mocks/mealCategories';
+import oneDrink from '../../cypress/mocks/oneDrink';
+import oneMeal from '../../cypress/mocks/oneMeal';
+import App from '../App';
 import CategoriesProvider from '../context/CategoriesProvider';
+import RecipesProvider from '../context/RecipesProvider';
+import fetchApi from '../servers/fetchApi';
+import renderWithRouter from './helpers/renderWithRouter';
+
+jest.mock('../servers/fetchApi');
 
 describe('Testa o componente <Recipes />', () => {
-  const recipes = [
-    {
-      idMeal: '52977',
-      strMeal: 'Corba',
-      strMealThumb: 'https://www.themealdb.com/images/media/meals/58oia61564916529.jpg',
-    },
-    {
-      idMeal: '53060',
-      strMeal: 'Burek',
-      strMealThumb: 'https://www.themealdb.com/images/media/meals/tkxquw1628771028.jpg',
-    },
-  ];
+  it('Testa se o componente é renderizado corretamente com as categorias corretas', async () => {
+    fetchApi.mockResolvedValueOnce(mealCategories);
+    fetchApi.mockResolvedValueOnce(drinkCategories);
+    fetchApi.mockResolvedValueOnce(chickenMeals);
 
-  const mealsCategories = ['Beef', 'Chicken', 'Breakfast', 'Goat', 'Dessert'];
-  const drinksCategories = ['Ordinary Drink', 'Cocktail', 'Milk / Float / Shake', 'Other/Unknown', 'Cocoa'];
-  const recipeDrinks = [
-    {
-      idDrink: '15997',
-      strDrink: 'GG',
-      strDrinkThumb: 'https://www.thecocktaildb.com/images/media/drink/vyxwut1468875960.jpg',
-    },
-    {
-      idDrink: '17222',
-      strDrink: 'A1',
-      strDrinkThumb: 'https://www.thecocktaildb.com/images/media/drink/2x8thr1504816928.jpg',
-    },
-  ];
-  it('Testa se o componente é renderizado corretamente com as categorias corretas', () => {
     renderWithRouter(
-      <CategoriesProvider>
-        <RecipesProvider>
-          <Recipes type="meal" recipes={ [] } />
-        </RecipesProvider>
-      </CategoriesProvider>,
+      <RecipesProvider>
+        <CategoriesProvider>
+          <App />
+        </CategoriesProvider>
+      </RecipesProvider>,
+      ['/meals'],
     );
-    const categoryBeef = screen.getByText('Beef');
-    const categoryChicken = screen.getByText('Chicken');
-    const categoryBreakfast = screen.getByText('Breakfast');
-    const categoryGoat = screen.getByText('Goat');
-    const categoryDessert = screen.getByText('Dessert');
+
+    const categoryBeef = await screen.findByText('Beef');
+    const categoryChicken = await screen.findByText('Chicken');
+    const categoryBreakfast = await screen.findByText('Breakfast');
+    const categoryGoat = await screen.findByText('Goat');
+    const categoryDessert = await screen.findByText('Dessert');
     expect(categoryBeef).toBeInTheDocument();
     expect(categoryChicken).toBeInTheDocument();
     expect(categoryBreakfast).toBeInTheDocument();
     expect(categoryGoat).toBeInTheDocument();
     expect(categoryDessert).toBeInTheDocument();
   });
-  it('Testa se o redirecionamento ocorre corretamente ao clicar nas receitas', () => {
-    // Função de mock para o redirecionamento
-    const mockHistoryPush = jest.fn();
-    renderWithRouter(
-      <CategoriesProvider>
-        <RecipesProvider>
-          <Categories categories={ mealsCategories } />
-          <Recipes type="meal" recipes={ recipes } />
-        </RecipesProvider>
-      </CategoriesProvider>,
+  it('Testa se o redirecionamento ocorre corretamente ao clicar nas receitas', async () => {
+    fetchApi.mockResolvedValueOnce(mealCategories);
+    fetchApi.mockResolvedValueOnce(drinkCategories);
+    fetchApi.mockResolvedValueOnce(chickenMeals);
+    fetchApi.mockResolvedValueOnce(oneMeal);
+
+    const { history } = renderWithRouter(
+      <RecipesProvider>
+        <CategoriesProvider>
+          <App />
+        </CategoriesProvider>
+      </RecipesProvider>,
+      ['/meals'],
     );
 
-    const renderedRecipes = screen.getByTestId('0-recipe-card');
-    const renderedRecipesName = screen.getByTestId('0-recipe-title');
-    const renderedRecipesImage = screen.getByTestId('0-recipe-card-img');
+    const renderedRecipes = await screen.findByTestId('0-recipe-card');
 
     // Simule o clique no primeiro card de receita
-    fireEvent.click(renderedRecipes);
+    userEvent.click(renderedRecipes);
 
     // Verifique se a função history.push foi chamada com a rota correta
-    expect(mockHistoryPush).toHaveBeenCalledWith('/meals/52977');
-    expect(renderedRecipesName).toBeInTheDocument();
-    expect(renderedRecipesImage).toBeInTheDocument();
+    await waitFor(() => {
+      expect(history.location.pathname).toEqual('/meals/52940');
+    });
   });
-  it('Testa para o type "drink" se o componente é renderizado corretamente com as categorias corretas', () => {
-    const mockHistoryPush = jest.fn();
+  it('Testa para o type "drink" se o componente é renderizado corretamente com as categorias corretas', async () => {
+    fetchApi.mockResolvedValueOnce(mealCategories);
+    fetchApi.mockResolvedValueOnce(drinkCategories);
+    fetchApi.mockResolvedValueOnce(cocktailDrinks);
+    fetchApi.mockResolvedValueOnce(oneDrink);
 
-    renderWithRouter(
-      <CategoriesProvider>
-        <RecipesProvider>
-          <Categories categories={ drinksCategories } />
-          <Recipes type="drink" recipes={ recipeDrinks } />
-        </RecipesProvider>
-      </CategoriesProvider>,
+    const { history } = renderWithRouter(
+      <RecipesProvider>
+        <CategoriesProvider>
+          <App />
+        </CategoriesProvider>
+      </RecipesProvider>,
+      ['/drinks'],
     );
 
-    const categoryOrdinaryDrink = screen.getByText('Ordinary Drink');
-    const categoryCocktail = screen.getByText('Cocktail');
-    const categoryMilk = screen.getByText('Milk / Float / Shake');
-    const categoryOther = screen.getByText('Other/Unknown');
-    const categoryCocoa = screen.getByText('Cocoa');
+    const categoryOrdinaryDrink = await screen.findByText('Ordinary Drink');
+    const categoryCocktail = await screen.findByText('Cocktail');
+    const categoryShake = await screen.findByText('Shake');
+    const categoryOther = await screen.findByText('Other/Unknown');
+    const categoryCocoa = await screen.findByText('Cocoa');
     const firstDrink = screen.getByTestId('0-recipe-card');
     expect(categoryOrdinaryDrink).toBeInTheDocument();
     expect(categoryCocktail).toBeInTheDocument();
-    expect(categoryMilk).toBeInTheDocument();
+    expect(categoryShake).toBeInTheDocument();
     expect(categoryOther).toBeInTheDocument();
     expect(categoryCocoa).toBeInTheDocument();
-    fireEvent.click(firstDrink);
-    expect(mockHistoryPush).toHaveBeenCalledWith('/drinks/15997');
+    userEvent.click(firstDrink);
+
+    await waitFor(() => {
+      expect(history.location.pathname).toEqual('/drinks/14029');
+    });
+  });
+  it('Testa o clique em uma categoria e sua renderização', async () => {
+    fetchApi.mockResolvedValueOnce(mealCategories);
+    fetchApi.mockResolvedValueOnce(drinkCategories);
+    fetchApi.mockResolvedValueOnce(cocktailDrinks);
+    fetchApi.mockResolvedValueOnce(cocoaDrinks);
+    fetchApi.mockResolvedValueOnce(cocktailDrinks);
+    fetchApi.mockResolvedValueOnce(cocktailDrinks);
+
+    renderWithRouter(
+      <RecipesProvider>
+        <CategoriesProvider>
+          <App />
+        </CategoriesProvider>
+      </RecipesProvider>,
+      ['/drinks'],
+    );
+
+    const categoryCocoa = await screen.findByText('Cocoa');
+    userEvent.click(categoryCocoa);
+    const firstCocoaDrink = await screen.findByText('Castillian Hot Chocolate');
+    expect(firstCocoaDrink).toBeInTheDocument();
+    userEvent.click(categoryCocoa);
+
+    const categoryAll = await screen.findByText('All');
+    userEvent.click(categoryAll);
   });
 });

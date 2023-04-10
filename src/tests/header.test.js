@@ -2,6 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from '../App';
 import Header from '../components/Header';
+import CategoriesProvider from '../context/CategoriesProvider';
 import RecipesProvider from '../context/RecipesProvider';
 import renderWithRouter from './helpers/renderWithRouter';
 
@@ -34,7 +35,9 @@ describe('Testes: Header', () => {
   test('Se ao clicar no botão "profile" direciona para rota profile', async () => {
     const { history } = renderWithRouter(
       <RecipesProvider>
-        <App hasSearchIcon />
+        <CategoriesProvider>
+          <App hasSearchIcon />
+        </CategoriesProvider>
       </RecipesProvider>,
     );
     expect(screen.getByTestId(emailId)).toBeInTheDocument();
