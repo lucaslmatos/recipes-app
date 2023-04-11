@@ -1,32 +1,29 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import copy from 'clipboard-copy';
 import AppContext from '../context/AppContext';
-import fecthApi from '../servers/fetchApi';
-import Recomendations from './Recomendations';
-import '../styles/RecipeDetails.css';
+import fetchApi from '../servers/fetchApi';
 import shareIcon from '../images/shareIcon.svg';
 import whiteHeartIcon from '../images/whiteHeartIcon.svg';
 import blackHeartIcon from '../images/blackHeartIcon.svg';
 
-export default function RecipeDetails({ type }) {
+export default function RecipeInProgress({ type }) {
   const { recipe, setRecipe, ingredients, setIngredients } = useContext(AppContext); // Pega os dados da receita pelo ID no estado.
   const [isLoading, setLoading] = useState(true); // Ativa o loading
   const [checkBtnStart, setBtnStart] = useState(true); // Ativa o botão de iniciar receita
-  const [checkBtnProg, setBtnProg] = useState(false); // Ativa o botão de continuar receita
   const [linkCopied, setLinkCopied] = useState(false); // Ativa o botão de copiar link
   const [isFavorite, setFavorite] = useState(false); // Ativa o botão de favoritar
+  const [ingredientCheck, setIngredientCheck] = useState([]);
   const { id } = useParams(); // Pega o ID da receita através da URL.
   const history = useHistory(); // Pega o histórico de navegação armazenado no navegador.
-  const location = useLocation(); // Pega a localização atual do usuário.
   const check = type === 'meal' ? 'meals' : 'drinks'; // Verifica se é comida ou bebida e retorna o nome da chave.
   const check2 = type === 'meal' ? 'Meal' : 'Drink';
   const check3 = type === 'meal' ? 'meal' : 'drink';
 
   useEffect(() => {
     async function getList() { // Função para pegar os dados da receita pelo ID.
-      const fetchdata = await fecthApi(`https://www.the${type}db.com/api/json/v1/1/lookup.php?i=${id}`); // Pega os dados da receita pelo ID.
+      const fetchdata = await fetchApi(`https://www.the${type}db.com/api/json/v1/1/lookup.php?i=${id}`); // Pega os dados da receita pelo ID.
       setRecipe({ id, data: fetchdata }); // Guarda os dados da receita pelo ID no estado global.
       const arr = []; // Cria um array vazio para armazenar os ingredientes.
       const vinte = 20;
@@ -38,7 +35,7 @@ export default function RecipeDetails({ type }) {
         if (data !== null && data !== '') { arr[i] = data; } // Pega os ingredientes e elimina os itens vazios da api.
       }
       setIngredients(arr); // Guarda os itens no estado.
-      setLoading(false); // Desativa o loading
+      setLoading(false);
     }
     getList();
   }, [id, setRecipe, type, isLoading, setIngredients, setLoading]); // Atualiza o estado quando o ID, o tipo de receita e o loading mudarem.
@@ -52,24 +49,6 @@ export default function RecipeDetails({ type }) {
     }
   }, [id]); // Atualiza o estado quando o ID mudar.
 
-  useEffect(() => { // Confere se já existe uma chave com as receitas em progresso e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver.
-    if ('inProgressRecipes' in localStorage) { // Confere se já existe uma chave com as receitas em progresso
-      const inProgressRecipes = JSON.parse(localStorage.getItem('inProgressRecipes')); // Pega os dados da chave inProgressRecipes salva no localStorage
-      if (inProgressRecipes.drinks // Confere se a receita atual já está salva no localStorage, se sim, ativa o botão de continuar receita
-        && Object.keys(inProgressRecipes.drinks).find((key) => key === id)) { // Confere se a receita atual já está salva no localStorage, se sim, ativa o botão de continuar receita
-        setBtnProg(true);
-      }
-      if (inProgressRecipes.meals // Confere se a receita atual já está salva no localStorage, se sim, ativa o botão de continuar receita
-        && Object.keys(inProgressRecipes.meals).find((key) => key === id)) {
-        setBtnProg(true);
-      }
-    } else { // Caso não haja uma chave com as receitas em progresso, cria uma chave genérica
-      localStorage.setItem('inProgressRecipes', JSON.stringify({
-        drinks: { 15997: [] }, meals: { 52772: [] }, // Cria uma chave genérica com o ID da receita atual
-      }));
-    }
-  }, [id]);
-
   useEffect(() => { // Confere se já existe uma chave com as receitas favoritas e ativa o botão caso a receita atual não conste no localSotrage. Cria uma chave genérica caso não houver.
     if ('favoriteRecipes' in localStorage) { // Confere se já existe uma chave com as receitas favoritas
       const favoriteRecipes = JSON.parse(localStorage.getItem('favoriteRecipes')); // Pega os dados da chave favoriteRecipes salva no localStorage
@@ -79,8 +58,15 @@ export default function RecipeDetails({ type }) {
     }
   }, [id]);
 
+  useEffect(() => {
+    const newIngredientCheck = ingredients.map((ingredient) => ({
+      name: ingredient,
+      checked: false,
+    }));
+    setIngredientCheck(newIngredientCheck);
+  }, [ingredients]);
+
   function handleClick({ target: { name } }) { // Função para ativar os botões de favoritar, iniciar e continuar receita
-    if (name === 'Start') { history.push(`${location.pathname}/in-progress`); } // Redireciona para a página de receita em progresso caso o botão de iniciar receita seja clicado
     const actualRecipe = { // Cria um objeto com os dados da receita atual
       id, // ID da receita
       type: check3, // Tipo de receita
@@ -107,8 +93,9 @@ export default function RecipeDetails({ type }) {
     }
     if (name === 'Share') { // Confere se o botão de compartilhar foi clicado
       setLinkCopied(true); // Ativa o estado de link copiado
-      copy(`http://localhost:3000${location.pathname}`); // Copia o link da receita atual
+      copy(`http://localhost:3000/${check}/${id}`); // Copia o link da receita atual
     }
+    if (name === 'Finish') { history.push('/done-recipes'); }
   }
 
   if (!isLoading) { // Confere se os dados da receita já foram carregados
@@ -119,7 +106,7 @@ export default function RecipeDetails({ type }) {
             recipe.data[check][0][`str${check2}Thumb`] // Confere se a receita atual possui imagem e a renderiza
           && <img
             src={ recipe.data[check][0][`str${check2}Thumb`] }
-            width="100px"
+            width="200px"
             alt={ [`str${check2}Thumb`] }
             data-testid="recipe-photo"
           />
@@ -137,28 +124,30 @@ export default function RecipeDetails({ type }) {
             <div data-testid="recipe-category">
               {recipe.data[check][0].strAlcoholic}
             </div>)}
-        <ul>
-          {ingredients.map((__, index) => (
-            <li key={ index } data-testid={ `${index}-ingredient-name-and-measure` }>
-              {recipe.data[check][0][`strIngredient${index + 1}`]}
-              {'     '}
-              {recipe.data[check][0][`strMeasure${index + 1}`]}
+        <ul style={ { listStyleType: 'none' } }>
+          {ingredientCheck.map((ingredient, index) => (
+            <li
+              key={ index }
+              data-testid={ `${index}-ingredient-step` }
+              style={ { textDecoration: ingredient.checked
+                ? 'line-through solid rgb(0,0,0)' : 'none' } }
+            >
+              <input
+                type="checkbox"
+                checked={ ingredient.checked }
+                onChange={ () => {
+                  const newList = [...ingredientCheck];
+                  newList[index].checked = !newList[index].checked;
+                  setIngredientCheck(newList);
+                } }
+              />
+              {ingredient.name}
             </li>
           ))}
         </ul>
         <div data-testid="instructions">
           {recipe.data[check][0].strInstructions}
         </div>
-        {check === 'meals'
-        && <iframe
-          data-testid="video"
-          width="360"
-          height="200"
-          src={ recipe.data.meals[0].strYoutube.replace('watch?v=', 'embed/') }
-          title={ recipe.data.meals[0].strMeal }
-        />}
-        {check === 'meals'
-          ? <Recomendations type="cocktail" /> : <Recomendations type="meal" />}
         <div className="social-buttons-div">
           <button
             name="Share"
@@ -194,25 +183,15 @@ export default function RecipeDetails({ type }) {
           </button>
         </div>
         {linkCopied && <div> Link copied!</div>}
-        {checkBtnStart && !checkBtnProg
+        {checkBtnStart
         && (
           <button
-            data-testid="start-recipe-btn"
-            name="Start"
-            className="action-buttons"
+            data-testid="finish-recipe-btn"
+            name="Finish"
+            disabled={ !ingredientCheck.every((ingredient) => ingredient.checked) }
             onClick={ handleClick }
           >
-            Start Recipe
-          </button>
-        )}
-        {checkBtnProg
-        && (
-          <button
-            data-testid="start-recipe-btn"
-            name="Continue"
-            className="action-buttons"
-          >
-            Continue Recipe
+            Finish Recipe
           </button>
         )}
       </div>
@@ -220,6 +199,6 @@ export default function RecipeDetails({ type }) {
   }
 }
 
-RecipeDetails.propTypes = {
-  type: PropTypes.string.isRequired,
+RecipeInProgress.propTypes = {
+  type: PropTypes.oneOf(['meal', 'cocktail']).isRequired,
 };
