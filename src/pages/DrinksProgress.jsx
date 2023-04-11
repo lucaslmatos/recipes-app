@@ -1,9 +1,11 @@
 import React from 'react';
+import RecipeInProgress from '../components/RecipeInProgress';
 
 function DrinksProgress() {
   return (
     <div>
-      Drinks Progress
+      Teste
+      <RecipeInProgress type="cocktail" />
     </div>
   );
 }
