@@ -11,15 +11,15 @@ import blackHeartIcon from '../images/blackHeartIcon.svg';
 export default function RecipeInProgress({ type }) {
   const {
     recipe, setRecipe,
-    ingredients, setIngredients,
+    setIngredients,
     setInstructions, setVideoLink,
     setTags,
     toggleFavorite, isFavorite,
     markRecipeAsDone,
+    ingredientCheck, updateProgress,
   } = useContext(AppContext);
   const [isLoading, setLoading] = useState(true);
   const [linkCopied, setLinkCopied] = useState(false);
-  const [ingredientCheck, setIngredientCheck] = useState([]);
   const { id } = useParams();
   const history = useHistory();
 
@@ -45,16 +45,6 @@ export default function RecipeInProgress({ type }) {
     fetchRecipe();
   }, [id, setRecipe, setIngredients, type, setTags,
     setLoading, setInstructions, setVideoLink]);
-
-  useEffect(() => {
-    const newIngredientCheck = ingredients.map((ingredient) => ({
-      name: ingredient.name,
-      measure: ingredient.measure,
-      checked: false,
-    }));
-    // TODO: também salvar no localStorage
-    setIngredientCheck(newIngredientCheck);
-  }, [ingredients]);
 
   const shareRecipe = () => {
     const path = recipe.type === RecipeType.MEAL ? 'meals' : 'drinks';
@@ -98,7 +88,8 @@ export default function RecipeInProgress({ type }) {
                 onChange={ () => {
                   const newList = [...ingredientCheck]; // Copia o array
                   newList[index].checked = !newList[index].checked; // Altera o valor do item para o oposto
-                  setIngredientCheck(newList); // Atualiza o estado
+                  updateProgress(newList);
+                  // setIngredientCheck(newList); // Atualiza o estado
                 } }
               />
               {ingredient.name}

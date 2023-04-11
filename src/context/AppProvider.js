@@ -17,6 +17,7 @@ function AppProvider({ children }) {
   const [isFavorite, setIsFavorite] = useState(false);
 
   const [inProgress, setInProgress] = useState(false);
+  const [ingredientCheck, setIngredientCheck] = useState([]);
 
   const [doneIndex, setDoneIndex] = useState(NOT_FOUND);
   const [isDone, setIsDone] = useState(false);
@@ -74,7 +75,7 @@ function AppProvider({ children }) {
   };
 
   const markRecipeAsStarted = useCallback(() => { // função que marca a receita como iniciada
-    if (!recipe) { // se recipe for null
+    if (!recipe || !ingredients) { // se recipe for null
       return; // retorna null
     }
 
@@ -83,9 +84,28 @@ function AppProvider({ children }) {
     const recipesMap = inProgressRecipes[`${recipe.type}s`]; // pega o tipo da receita
 
     if (!recipesMap[recipe.id]) { // se a receita não estiver no map
-      recipesMap[recipe.id] = []; // adiciona a receita no map
+      recipesMap[recipe.id] = ingredients.map((ingredient) => ({
+        name: ingredient.name,
+        measure: ingredient.measure,
+        checked: false,
+      }));
+
+      setIngredientCheck(recipesMap[recipe.id]);
+      saveInProgressRecipes(inProgressRecipes);
+    }
+  }, [recipe, ingredients]);
+
+  const updateProgress = useCallback((progress) => {
+    if (!recipe) {
+      return;
     }
 
+    const inProgressRecipes = loadInProgressRecipes();
+    const recipesMap = inProgressRecipes[`${recipe.type}s`];
+
+    recipesMap[recipe.id] = progress;
+
+    setIngredientCheck(progress);
     saveInProgressRecipes(inProgressRecipes);
   }, [recipe]);
 
@@ -96,10 +116,16 @@ function AppProvider({ children }) {
       const progress = inProgressRecipes[`${recipe.type}s`][recipe.id]; // pega o progresso da receita
 
       setInProgress(!!progress); // seta como true se progress for diferente de null
+      setIngredientCheck(progress || ingredients.map((ingredient) => ({
+        name: ingredient.name,
+        measure: ingredient.measure,
+        checked: false,
+      })));
     } else {
       setInProgress(false);
+      setIngredientCheck([]);
     }
-  }, [recipe]);
+  }, [recipe, ingredients]);
 
   // LocalStorage Receitas Feitas
 
@@ -119,7 +145,7 @@ function AppProvider({ children }) {
 
     const doneRecipes = loadDoneRecipes(); // carrega as receitas feitas
 
-    doneRecipes.push({ // adiciona a receita feita no array de receitas feitas.
+    doneRecipes.push({ // adiciona a receita feita no array de receitas feitas
       ...recipe, // adiciona todas as propriedades de recipe
       doneDate: new Date().toISOString(), // adiciona a data de conclusão da receita
       tags, // adiciona as tags da receita (implementação futura)
@@ -165,10 +191,12 @@ function AppProvider({ children }) {
     markRecipeAsStarted,
     isDone,
     markRecipeAsDone,
+    ingredientCheck,
+    updateProgress,
   }), [
     recipe, ingredients, instructions, videoLink, tags,
-    recommendations, isFavorite, inProgress, isDone,
-    toggleFavorite, markRecipeAsStarted, markRecipeAsDone,
+    recommendations, isFavorite, inProgress, isDone, ingredientCheck,
+    toggleFavorite, markRecipeAsStarted, markRecipeAsDone, updateProgress,
   ]);
 
   return (
