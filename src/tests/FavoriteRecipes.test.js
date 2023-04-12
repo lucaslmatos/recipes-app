@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
-import renderWithRouter from './helpers/renderWithRouter';
+import renderWithRouter from '../helpers/renderWithRouter';
 import App from '../App';
 
 const favoritePage = '/favorite-recipes';
