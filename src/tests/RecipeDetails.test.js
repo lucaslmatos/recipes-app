@@ -126,6 +126,7 @@ describe('Testes: Página de Detalhes da Receita.', () => {
     await waitFor(() => {
       expect(screen.getByTestId(/start-recipe-btn/i)).toBeInTheDocument();
       userEvent.click(screen.getByTestId(/start-recipe-btn/i));
+      expect(location.pathname).toBe('/drinks/15997/in-progress');
     }, { timeout: 4000 });
   });
 
