@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Profile from '../pages/Profile';
-import renderWithRouter from './helpers/renderWithRouter';
+import renderWithRouter from '../helpers/renderWithRouter';
 
 describe('Teste do componente <Profile />', () => {
   test('Se o botão "Done Recipes" aparece na tela e se ocorre redirecionamento', async () => {

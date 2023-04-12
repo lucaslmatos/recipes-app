@@ -1,9 +1,11 @@
 import React from 'react';
+import RecipeInProgress from '../components/RecipeInProgress';
+import { RecipeType } from '../servers/fetchApi';
 
 function MealsProgress() {
   return (
     <div>
-      Meals Progress
+      <RecipeInProgress type={ RecipeType.MEAL } />
     </div>
   );
 }

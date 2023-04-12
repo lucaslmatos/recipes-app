@@ -1,30 +1,27 @@
 import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import copy from 'clipboard-copy';
 import AppContext from '../context/AppContext';
 import { fetchRecipeByIdAndType, RecipeType } from '../servers/fetchApi';
-import Recomendations from './Recomendations';
-import '../styles/RecipeDetails.css';
 import shareIcon from '../images/shareIcon.svg';
 import whiteHeartIcon from '../images/whiteHeartIcon.svg';
 import blackHeartIcon from '../images/blackHeartIcon.svg';
 
-export default function RecipeDetails({ type, recommendationType }) {
+export default function RecipeInProgress({ type }) {
   const {
     recipe, setRecipe,
     ingredients, setIngredients,
-    instructions, setInstructions,
-    videoLink, setVideoLink,
+    setInstructions, setVideoLink,
     setTags,
     toggleFavorite, isFavorite,
-    inProgress, isDone, markRecipeAsStarted,
+    markRecipeAsDone,
   } = useContext(AppContext);
   const [isLoading, setLoading] = useState(true);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [ingredientCheck, setIngredientCheck] = useState([]);
   const { id } = useParams();
   const history = useHistory();
-  const location = useLocation();
 
   useEffect(() => {
     async function fetchRecipe() {
@@ -46,15 +43,18 @@ export default function RecipeDetails({ type, recommendationType }) {
     }
 
     fetchRecipe();
-  }, [
-    id, setRecipe, setIngredients, type,
-    setLoading, setInstructions, setVideoLink, setTags,
-  ]);
+  }, [id, setRecipe, setIngredients, type, setTags,
+    setLoading, setInstructions, setVideoLink]);
 
-  const startRecipe = () => {
-    markRecipeAsStarted();
-    history.push(location.pathname.concat('/in-progress'));
-  };
+  useEffect(() => {
+    const newIngredientCheck = ingredients.map((ingredient) => ({
+      name: ingredient.name,
+      measure: ingredient.measure,
+      checked: false,
+    }));
+    // TODO: também salvar no localStorage
+    setIngredientCheck(newIngredientCheck);
+  }, [ingredients]);
 
   const shareRecipe = () => {
     const path = recipe.type === RecipeType.MEAL ? 'meals' : 'drinks';
@@ -62,13 +62,18 @@ export default function RecipeDetails({ type, recommendationType }) {
     setLinkCopied(true);
   };
 
-  if (!isLoading) {
+  const finishRecipe = () => {
+    markRecipeAsDone();
+    history.push('/done-recipes');
+  };
+
+  if (!isLoading) { // Confere se os dados da receita já foram carregados
     return (
       <div>
         <div>
           {recipe.image && <img
             src={ recipe.image }
-            width="100px"
+            width="200px"
             alt={ recipe.image }
             data-testid="recipe-photo"
           />}
@@ -79,31 +84,32 @@ export default function RecipeDetails({ type, recommendationType }) {
         <div data-testid="recipe-category">
           {recipe.type === RecipeType.MEAL ? recipe.category : recipe.alcoholicOrNot}
         </div>
-        <ul>
-          {ingredients.map(({ name, measure }, index) => (
+        <ul style={ { listStyleType: 'none' } }>
+          {ingredientCheck.map((ingredient, index) => (
             <li
-              key={ name }
-              data-testid={ `${index}-ingredient-name-and-measure` }
+              key={ index }
+              data-testid={ `${index}-ingredient-step` }
+              style={ { textDecoration: ingredient.checked
+                ? 'line-through solid rgb(0,0,0)' : 'none' } }
             >
-              {`${name}     ${measure}`}
+              <input
+                type="checkbox"
+                checked={ ingredient.checked }
+                onChange={ () => {
+                  const newList = [...ingredientCheck]; // Copia o array
+                  newList[index].checked = !newList[index].checked; // Altera o valor do item para o oposto
+                  setIngredientCheck(newList); // Atualiza o estado
+                } }
+              />
+              {ingredient.name}
+              -
+              {ingredient.measure === null ? '' : ingredient.measure}
             </li>
           ))}
         </ul>
         <div data-testid="instructions">
-          {instructions}
+          {recipe.instructions}
         </div>
-        {type === RecipeType.MEAL && (
-          <iframe
-            data-testid="video"
-            width="360"
-            height="200"
-            src={ videoLink }
-            title={ recipe.name }
-          />
-        )}
-
-        <Recomendations type={ recommendationType } />
-
         <div className="social-buttons-div">
           <button
             name="Share"
@@ -121,41 +127,37 @@ export default function RecipeDetails({ type, recommendationType }) {
             src={ isFavorite ? blackHeartIcon : whiteHeartIcon }
             onClick={ toggleFavorite }
           >
-            {isFavorite
-              ? (
-                <img
-                  data-testid="favorite-btn"
-                  name="Favorite"
-                  src={ blackHeartIcon }
-                  alt="share icon"
-                />)
-              : (
-                <img
-                  data-testid="favorite-btn"
-                  name="Favorite"
-                  src={ whiteHeartIcon }
-                  alt="share icon"
-                />)}
+            {isFavorite ? (
+              <img
+                data-testid="favorite-btn"
+                name="Favorite"
+                src={ blackHeartIcon }
+                alt="share icon"
+              />
+            ) : (
+              <img
+                data-testid="favorite-btn"
+                name="Favorite"
+                src={ whiteHeartIcon }
+                alt="share icon"
+              />
+            )}
           </button>
         </div>
         {linkCopied && <div> Link copied!</div>}
-
-        {!isDone && (
-          <button
-            data-testid="start-recipe-btn"
-            name={ inProgress ? 'Continue Recipe' : 'Start Recipe' }
-            className="action-buttons"
-            onClick={ startRecipe }
-          >
-            {inProgress ? 'Continue Recipe' : 'Start Recipe'}
-          </button>
-        )}
+        <button
+          data-testid="finish-recipe-btn"
+          name="Finish"
+          disabled={ !ingredientCheck.every((ingredient) => ingredient.checked) }
+          onClick={ finishRecipe }
+        >
+          Finish Recipe
+        </button>
       </div>
     );
   }
 }
 
-RecipeDetails.propTypes = {
+RecipeInProgress.propTypes = {
   type: PropTypes.oneOf(Object.values(RecipeType)).isRequired,
-  recommendationType: PropTypes.oneOf(Object.values(RecipeType)).isRequired,
 };

@@ -13,7 +13,7 @@ import SearchBar from '../components/SearchBar';
 import CategoriesProvider from '../context/CategoriesProvider';
 import RecipesProvider from '../context/RecipesProvider';
 import fetchApi from '../servers/fetchApi';
-import renderWithRouter from './helpers/renderWithRouter';
+import renderWithRouter from '../helpers/renderWithRouter';
 
 jest.mock('../servers/fetchApi');
 
@@ -53,6 +53,22 @@ describe('Testes: Search', () => {
 
     const ingredient = screen.getByTestId(ingredientSearch);
     userEvent.click(ingredient);
+
+    const button = screen.getByTestId(buttonSearch);
+    userEvent.click(button);
+  });
+  test('Teste com input text e tipo radio "first-letter"', () => {
+    fetchApi.mockResolvedValue(chickenMeals);
+    renderWithRouter(
+      <RecipesProvider>
+        <SearchBar />
+      </RecipesProvider>,
+    );
+    const searchInput = screen.getByTestId(searchInputTextId);
+    userEvent.type(searchInput, 'o');
+
+    const firstLetterSearch = screen.getByTestId(firstLetter);
+    userEvent.click(firstLetterSearch);
 
     const button = screen.getByTestId(buttonSearch);
     userEvent.click(button);

@@ -35,9 +35,7 @@ function SearchBar() {
       return fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?s=${inputSearch}`);
     }
 
-    if (recipesType === 'first-letter') {
-      return fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?f=${inputSearch}`);
-    }
+    return fetchApi(`https://www.${drinksOrMeals}.com/api/json/v1/1/search.php?f=${inputSearch}`);
   };
 
   const handleButtonSearch = async () => {

@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import userEvent from '@testing-library/user-event';
-import renderWithRouter from './helpers/renderWithRouter';
+import renderWithRouter from '../helpers/renderWithRouter';
 import App from '../App';
 
 const meals = '/meals/52772';
@@ -30,19 +30,50 @@ describe('Testes: Página de Detalhes da Receita.', () => {
     const { history } = renderWithRouter(<App />);
     localStorage.clear();
     act(() => {
-      history.push('/drinks/15997');
+      history.push('/drinks/17222');
     });
 
     await waitFor(() => {
       expect(screen.getByTestId(/recipe-photo/i)).toBeInTheDocument();
       expect(screen.getByTestId(/recipe-title/i)).toBeInTheDocument();
       expect(screen.getByTestId(/recipe-category/i)).toBeInTheDocument();
-      expect(screen.getAllByTestId(/-ingredient-name-and-measure/i)).toHaveLength(3);
+      expect(screen.getAllByTestId(/-ingredient-name-and-measure/i)).toHaveLength(4);
       expect(screen.getByTestId(/instructions/i)).toBeInTheDocument();
       expect(screen.getAllByTestId(/-recommendation-card/i)).toHaveLength(6);
       expect(screen.getAllByTestId(/-recommendation-title/i)).toHaveLength(6);
       expect(screen.getByTestId(/start-recipe-btn/i)).toBeInTheDocument();
     }, { timeout: 4000 });
+  });
+
+  test('Testa o botão de compartilhar', async () => {
+    const { history } = renderWithRouter(<App />);
+    act(() => { history.push('/meals/53065'); });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(/share-btn/i)).toBeInTheDocument();
+      userEvent.click(screen.getByTestId(/share-btn/i));
+    }, { timeout: 2000 });
+
+    act(() => { history.push('/drinks/15288'); });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(/share-btn/i)).toBeInTheDocument();
+      userEvent.click(screen.getByTestId(/share-btn/i));
+    }, { timeout: 2000 });
+
+    act(() => { history.push('/meals/53065/in-progress'); });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(/share-btn/i)).toBeInTheDocument();
+      userEvent.click(screen.getByTestId(/share-btn/i));
+    }, { timeout: 2000 });
+
+    act(() => { history.push('/drinks/15997/in-progress'); });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(/share-btn/i)).toBeInTheDocument();
+      userEvent.click(screen.getByTestId(/share-btn/i));
+    }, { timeout: 2000 });
   });
 
   test('Botão de start não deve aparecer, caso receita já exista no local storage', async () => {
@@ -70,7 +101,7 @@ describe('Testes: Página de Detalhes da Receita.', () => {
   });
 
   test('Botão de start deve aparecer, caso receita não exista no local storage', async () => {
-    const { history } = renderWithRouter(<App />);
+    const { history, location } = renderWithRouter(<App />);
 
     localStorage.setItem('doneRecipes', JSON.stringify([{
       id: '15997',
@@ -85,11 +116,13 @@ describe('Testes: Página de Detalhes da Receita.', () => {
     }]));
 
     act(() => {
-      history.push('/drinks/17222');
+      history.push('/drinks/15997');
     });
 
     await waitFor(() => {
       expect(screen.getByTestId(/start-recipe-btn/i)).toBeInTheDocument();
+      userEvent.click(screen.getByTestId(/start-recipe-btn/i));
+      expect(location.pathname).toBe('/drinks/15997/in-progress');
     }, { timeout: 4000 });
   });
 
@@ -141,5 +174,35 @@ describe('Testes: Página de Detalhes da Receita.', () => {
       userEvent.dblClick(screen.getByTestId(/favorite-btn/i));
       expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'whiteHeartIcon.svg');
     }, { timeout: 4000 });
+  });
+
+  // Componente RecipeInProgress
+  test('Testa o botão de finalizar receita', async () => {
+    const { history, location } = renderWithRouter(<App />);
+
+    act(() => {
+      history.push('/drinks/17222/in-progress');
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId(/finish-recipe-btn/i)).toBeInTheDocument();
+      userEvent.click(screen.getByTestId(/finish-recipe-btn/i));
+      expect(location.pathname).toBe('/done-recipes');
+    }, { timeout: 2000 });
+  });
+
+  test('Testa os checkbox', async () => {
+    const { history } = renderWithRouter(<App />);
+    act(() => { history.push('/drinks/17222'); });
+
+    await waitFor(() => {
+      const startButton = screen.getByTestId(/start-recipe-btn/i);
+      userEvent.click(startButton);
+      expect(screen.getAllByRole('checkbox').toHaveLength(4));
+      userEvent.click(screen.getAllByRole('checkbox')[0]);
+      userEvent.click(screen.getAllByRole('checkbox')[1]);
+      userEvent.click(screen.getAllByRole('checkbox')[2]);
+      userEvent.click(screen.getAllByRole('checkbox')[3]);
+    }, { timeout: 2000 });
   });
 });

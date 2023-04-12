@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, render, screen, fireEvent } from '@testing-library/react';
 import Footer from '../components/Footer';
-import renderWithRouter from './helpers/renderWithRouter';
+import renderWithRouter from '../helpers/renderWithRouter';
 
 describe('Testa o componente <Footer />', () => {
   it('Testa se o componente <Footer /> é renderizado', () => {
