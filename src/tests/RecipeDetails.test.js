@@ -5,8 +5,8 @@ import renderWithRouter from './helpers/renderWithRouter';
 import App from '../App';
 
 const meals = '/meals/52772';
-const black = 'blackHeartIcon.svg'
-const white = 'whiteHeartIcon.svg'
+const black = 'blackHeartIcon.svg';
+const white = 'whiteHeartIcon.svg';
 
 jest.mock('clipboard-copy', () => jest.fn());
 
