@@ -38,15 +38,12 @@ function FavoriteRecipes() {
       }
     } else {
       setList([{ info: 'none' }]);
-      console.log(list);
     }
   };
 
   const handleShare = ({ target: { name, id, className } }) => {
     setLinkCopied(true);
     setIndexClick(className);
-    const timer = 4000;
-    setTimeout(() => setLinkCopied(false), timer);
     return copy(`http://localhost:3000/${name}s/${id}`);
   };
 
@@ -154,7 +151,7 @@ function FavoriteRecipes() {
         ))
           : (
             <div>
-              vazio
+              Empty...
             </div>
           )}
       </div>
