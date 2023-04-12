@@ -4,7 +4,7 @@ import App from '../App';
 import Header from '../components/Header';
 import CategoriesProvider from '../context/CategoriesProvider';
 import RecipesProvider from '../context/RecipesProvider';
-import renderWithRouter from './helpers/renderWithRouter';
+import renderWithRouter from '../helpers/renderWithRouter';
 
 const email = 'lucaslopesm_22@hotmail.com';
 const password = '1234567';

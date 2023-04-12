@@ -12,7 +12,7 @@ import App from '../App';
 import CategoriesProvider from '../context/CategoriesProvider';
 import RecipesProvider from '../context/RecipesProvider';
 import fetchApi from '../servers/fetchApi';
-import renderWithRouter from './helpers/renderWithRouter';
+import renderWithRouter from '../helpers/renderWithRouter';
 
 jest.mock('../servers/fetchApi');
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import RecipeDetails from '../components/RecipeDetails';
+import { RecipeType } from '../servers/fetchApi';
 
 function MealsRecipes() {
   const { id } = useParams();
@@ -9,7 +10,7 @@ function MealsRecipes() {
       Meal Recipe id :
       {' '}
       { id }
-      <RecipeDetails type="meal" />
+      <RecipeDetails type={ RecipeType.MEAL } recommendationType={ RecipeType.DRINK } />
     </div>
   );
 }
