@@ -1,11 +1,11 @@
 import React from 'react';
 import RecipeInProgress from '../components/RecipeInProgress';
+import { RecipeType } from '../servers/fetchApi';
 
 function DrinksProgress() {
   return (
     <div>
-      Teste
-      <RecipeInProgress type="cocktail" />
+      <RecipeInProgress type={ RecipeType.DRINK } />
     </div>
   );
 }
