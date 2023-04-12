@@ -7,14 +7,18 @@ import blackHeartIcon from '../images/blackHeartIcon.svg';
 import '../styles/RecipeDetails.css';
 
 function FavoriteRecipes() {
-  const [list, setList] = useState([{}]);
+  const [list, setList] = useState([{ info: 'none' }]);
   const [linkCopied, setLinkCopied] = useState(false);
   const [indexClicked, setIndexClick] = useState('');
 
   useEffect(() => {
     if ('favoriteRecipes' in localStorage) {
       const favoriteRecipes = JSON.parse(localStorage.getItem('favoriteRecipes'));
-      setList(favoriteRecipes);
+      if (favoriteRecipes.length === 0) {
+        setList([{ info: 'none' }]);
+      } else {
+        setList(favoriteRecipes);
+      }
     }
   }, [setList]);
 
@@ -27,9 +31,14 @@ function FavoriteRecipes() {
     } else if (name === 'drinks' && favDrinks.length >= 1) {
       setList(favDrinks);
     } else if (name === 'all') {
-      setList(favoriteRecipes);
+      if (favoriteRecipes.length !== 0) {
+        setList(favoriteRecipes);
+      } else {
+        setList([{ info: 'none' }]);
+      }
     } else {
-      setList([{}]);
+      setList([{ info: 'none' }]);
+      console.log(list);
     }
   };
 
@@ -41,8 +50,15 @@ function FavoriteRecipes() {
     return copy(`http://localhost:3000/${name}s/${id}`);
   };
 
-  const handleFavorite = () => {
-
+  const handleFavorite = ({ target: { id } }) => {
+    const favoriteRecipes = JSON.parse(localStorage.getItem('favoriteRecipes'));
+    const newfavoriteRecipes = favoriteRecipes.filter((e) => e.id !== id);
+    localStorage.setItem('favoriteRecipes', JSON.stringify(newfavoriteRecipes));
+    if (newfavoriteRecipes.length !== 0) {
+      setList(newfavoriteRecipes);
+    } else {
+      setList([{ info: 'none' }]);
+    }
   };
 
   return (
@@ -77,7 +93,7 @@ function FavoriteRecipes() {
         </button>
       </div>
       <div>
-        {list.map((favorite, index) => (
+        {(list[0].info !== 'none') ? list.map((favorite, index) => (
           <div key={ index }>
             <Link
               to={ `/${favorite.type}s/${favorite.id}` }
@@ -89,12 +105,11 @@ function FavoriteRecipes() {
                 className="carousel-image"
                 data-testid={ `${index}-horizontal-image` }
               />
-              <h3
+              <div
                 data-testid={ `${index}-horizontal-name` }
-                className="card-title-favorite"
               >
                 { favorite.name }
-              </h3>
+              </div>
 
             </Link>
             <div>
@@ -126,17 +141,22 @@ function FavoriteRecipes() {
               </button>
               {(linkCopied && indexClicked === String(index)) && <div> Link copied!</div>}
             </div>
-            {/* <h4
+            <div
               data-testid={ `${index}-horizontal-top-text` }
               className="card-subtitle-favorite"
             >
-              { favorite.alcoholicOrNot.length > 1
+              { favorite.alcoholicOrNot !== ''
                 ? favorite.alcoholicOrNot
                 : `${favorite.nationality} - ${favorite.category}` }
-            </h4> */}
+            </div>
 
           </div>
-        ))}
+        ))
+          : (
+            <div>
+              vazio
+            </div>
+          )}
       </div>
     </div>
   );

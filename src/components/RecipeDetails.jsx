@@ -97,8 +97,8 @@ export default function RecipeDetails({ type }) {
         localStorage.setItem('favoriteRecipes', JSON.stringify(favoriteRecipes));
         setFavorite(true);
       } else {
-        const newfavoriteecipes = favoriteRecipes.filter((e) => e.id !== id);
-        localStorage.setItem('favoriteRecipes', JSON.stringify(newfavoriteecipes));
+        const newfavoriteRecipes = favoriteRecipes.filter((e) => e.id !== id);
+        localStorage.setItem('favoriteRecipes', JSON.stringify(newfavoriteRecipes));
         setFavorite(false);
       }
     } else {
