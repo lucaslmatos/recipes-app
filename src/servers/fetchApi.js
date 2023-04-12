@@ -21,11 +21,17 @@ const mealToRecipe = (meal) => {
   const mealIngredients = [];
 
   for (let i = 1; i <= MAX_INGREDIENTS; i += 1) {
-    const ingredient = meal[`strIngredient${i}`]?.trim(' ');
-    if (ingredient) {
+    const ingredient = meal[`strIngredient${i}`]?.trim(' '); // trim() remove espaços em branco no início e no fim de uma string
+    const measure = meal[`strMeasure${i}`]?.trim(' ');
+    if (!measure && ingredient) { // se o ingrediente não existir
+      mealIngredients.push({ // adiciona o ingrediente no array de ingredientes
+        name: ingredient, // nome do ingrediente
+      });
+    }
+    if (measure && ingredient) {
       mealIngredients.push({
         name: ingredient,
-        measure: meal[`strMeasure${i}`],
+        measure,
       });
     }
   }
@@ -69,10 +75,17 @@ const drinkToRecipe = (drink) => {
 
   for (let i = 1; i <= MAX_INGREDIENTS; i += 1) {
     const ingredient = drink[`strIngredient${i}`]?.trim(' ');
-    if (ingredient) {
+    const measure = drink[`strMeasure${i}`]?.trim(' ');
+    if (!measure && ingredient) {
       drinkIngredients.push({
         name: ingredient,
-        measure: drink[`strMeasure${i}`],
+        measure: '',
+      });
+    }
+    if (measure && ingredient) {
+      drinkIngredients.push({
+        name: ingredient,
+        measure,
       });
     }
   }

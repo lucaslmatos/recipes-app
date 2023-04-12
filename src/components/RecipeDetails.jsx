@@ -33,11 +33,13 @@ export default function RecipeDetails({ type, recommendationType }) {
       try {
         const info = await fetchRecipeByIdAndType(id, type);
 
-        setRecipe(info.recipe);
-        setIngredients(info.ingredients);
-        setInstructions(info.instructions);
-        setVideoLink(info.videoLink);
-        setTags(info.tags);
+        if (info) {
+          setRecipe(info.recipe);
+          setIngredients(info.ingredients);
+          setInstructions(info.instructions);
+          setVideoLink(info.videoLink);
+          setTags(info.tags);
+        }
       } finally {
         setLoading(false);
       }

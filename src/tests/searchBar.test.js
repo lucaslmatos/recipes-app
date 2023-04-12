@@ -57,6 +57,22 @@ describe('Testes: Search', () => {
     const button = screen.getByTestId(buttonSearch);
     userEvent.click(button);
   });
+  test('Teste com input text e tipo radio "first-letter"', () => {
+    fetchApi.mockResolvedValue(chickenMeals);
+    renderWithRouter(
+      <RecipesProvider>
+        <SearchBar />
+      </RecipesProvider>,
+    );
+    const searchInput = screen.getByTestId(searchInputTextId);
+    userEvent.type(searchInput, 'o');
+
+    const firstLetterSearch = screen.getByTestId(firstLetter);
+    userEvent.click(firstLetterSearch);
+
+    const button = screen.getByTestId(buttonSearch);
+    userEvent.click(button);
+  });
   test('Teste input radio "first-letter" com alert', () => {
     fetchApi.mockResolvedValueOnce(chickenMeals);
     renderWithRouter(
