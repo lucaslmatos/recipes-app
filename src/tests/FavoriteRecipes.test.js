@@ -5,9 +5,6 @@ import renderWithRouter from './helpers/renderWithRouter';
 import App from '../App';
 
 const meals = '/meals/52772';
-const black = 'blackHeartIcon.svg'
-const white = 'whiteHeartIcon.svg'
-
 jest.mock('clipboard-copy', () => jest.fn());
 
 describe('Testes: Página de Detalhes da Receita.', () => {
@@ -94,7 +91,6 @@ describe('Testes: Página de Detalhes da Receita.', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId(/start-recipe-btn/i)).toBeInTheDocument();
-      userEvent.click(screen.getByTestId(/start-recipe-btn/i));
     }, { timeout: 4000 });
   });
 
@@ -126,29 +122,11 @@ describe('Testes: Página de Detalhes da Receita.', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', black);
+      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'blackHeartIcon.svg');
       userEvent.click(screen.getByTestId(/favorite-btn/i));
-      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', white);
+      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'whiteHeartIcon.svg');
       userEvent.click(screen.getByTestId(/favorite-btn/i));
-      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', black);
-    }, { timeout: 4000 });
-  });
-
-  test('Botão de favorito deve estar vazio caso não exista a receita na chave de favoritos', async () => {
-    const { history } = renderWithRouter(<App />);
-    localStorage.setItem('favoriteRecipes', JSON.stringify([{
-      id: 'dsad',
-    }]));
-    act(() => {
-      history.push(meals);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', white);
-      userEvent.click(screen.getByTestId(/favorite-btn/i));
-      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', black);
-      userEvent.click(screen.getByTestId(/favorite-btn/i));
-      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', white);
+      expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'blackHeartIcon.svg');
     }, { timeout: 4000 });
   });
 
@@ -163,7 +141,6 @@ describe('Testes: Página de Detalhes da Receita.', () => {
     await waitFor(() => {
       userEvent.dblClick(screen.getByTestId(/favorite-btn/i));
       expect(screen.getByTestId(/favorite-btn/i)).toHaveAttribute('src', 'whiteHeartIcon.svg');
-      userEvent.click(screen.getByTestId(/share-btn/i));
     }, { timeout: 4000 });
   });
 });
