@@ -107,7 +107,7 @@ export default function RecipeDetails({ type }) {
     }
     if (name === 'Share') {
       setLinkCopied(true);
-      copy(`http://localhost:3000${location.pathname}`);
+      return copy(`http://localhost:3000${location.pathname}`);
     }
   }
 
