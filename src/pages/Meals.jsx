@@ -7,16 +7,6 @@ import RecipesContext from '../context/RecipesContext';
 
 function Meals() {
   const { listMealsOrDrinks } = useContext(RecipesContext);
-  // const history = useHistory();
-
-  // Tirei o useEffect aqui, pois estava dando conflito com a lógica do SearchBar.
-
-  // useEffect(() => {
-  //   if (listMealsOrDrinks.length === 1) {
-  //     const idDrinkOrMeals = listMealsOrDrinks[0].idMeal;
-  //     history.push(`/meals/${idDrinkOrMeals}`);
-  //   }
-  // }, [listMealsOrDrinks, history]);
   const maxNumber = 12;
   const newListDrinks = listMealsOrDrinks.slice(0, maxNumber);
 

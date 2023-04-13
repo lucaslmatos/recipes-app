@@ -54,13 +54,6 @@ function SearchBar() {
     }
   };
 
-  // useEffect(() => {
-  //   if (listMealsOrDrinks.length === 1) {
-  //     const idDrinkOrMeals = listMealsOrDrinks[0][id];
-  //     history.push(`/${drinksOrMealsKeys}/${idDrinkOrMeals}`);
-  //   }
-  // }, [listMealsOrDrinks, isAtDrinkPage, history, drinksOrMealsKeys, id]);
-
   return (
     <div>
       <input
