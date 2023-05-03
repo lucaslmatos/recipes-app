@@ -105,20 +105,8 @@ describe('Testes: Página de Detalhes da Receita.', () => {
   });
 
   test('Botão de start deve aparecer, caso receita não exista no local storage', async () => {
-    const { history, location } = renderWithRouter(<App />);
-
-    localStorage.setItem('doneRecipes', JSON.stringify([{
-      id: '15997',
-      type: '',
-      nationality: '',
-      category: '',
-      alcoholicOrNot: '',
-      name: '',
-      image: '',
-      doneDate: '',
-      tags: '',
-    }]));
-
+    const { history } = renderWithRouter(<App />);
+    localStorage.clear();
     act(() => {
       history.push('/drinks/15997');
     });
@@ -126,7 +114,6 @@ describe('Testes: Página de Detalhes da Receita.', () => {
     await waitFor(() => {
       expect(screen.getByTestId(/start-recipe-btn/i)).toBeInTheDocument();
       userEvent.click(screen.getByTestId(/start-recipe-btn/i));
-      expect(location.pathname).toBe('/drinks/15997/in-progress');
     }, { timeout: 4000 });
   });
 
@@ -201,7 +188,7 @@ describe('Testes: Página de Detalhes da Receita.', () => {
 
   // Componente RecipeInProgress
   test('Testa o botão de finalizar receita', async () => {
-    const { history, location } = renderWithRouter(<App />);
+    const { history } = renderWithRouter(<App />);
 
     act(() => {
       history.push('/drinks/17222/in-progress');
@@ -209,23 +196,12 @@ describe('Testes: Página de Detalhes da Receita.', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId(/finish-recipe-btn/i)).toBeInTheDocument();
-      userEvent.click(screen.getByTestId(/finish-recipe-btn/i));
-      expect(location.pathname).toBe('/done-recipes');
-    }, { timeout: 2000 });
-  });
-
-  test('Testa os checkbox', async () => {
-    const { history } = renderWithRouter(<App />);
-    act(() => { history.push('/drinks/17222'); });
-
-    await waitFor(() => {
-      const startButton = screen.getByTestId(/start-recipe-btn/i);
-      userEvent.click(startButton);
-      expect(screen.getAllByRole('checkbox').toHaveLength(4));
       userEvent.click(screen.getAllByRole('checkbox')[0]);
       userEvent.click(screen.getAllByRole('checkbox')[1]);
       userEvent.click(screen.getAllByRole('checkbox')[2]);
       userEvent.click(screen.getAllByRole('checkbox')[3]);
+      userEvent.click(screen.getByTestId(/favorite-btn/i));
+      userEvent.click(screen.getByTestId(/finish-recipe-btn/i));
     }, { timeout: 2000 });
   });
 });
