@@ -119,7 +119,7 @@ function AppProvider({ children }) {
 
     const doneRecipes = loadDoneRecipes(); // carrega as receitas feitas
 
-    doneRecipes.push({ // adiciona a receita feita no array de receitas feitas
+    doneRecipes.push({ // adiciona a receita feita no array de receitas feitas.
       ...recipe, // adiciona todas as propriedades de recipe
       doneDate: new Date().toISOString(), // adiciona a data de conclusão da receita
       tags, // adiciona as tags da receita (implementação futura)
